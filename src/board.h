@@ -31,6 +31,9 @@
 #define PIECE_TYPE(x) ((x)&7)
 #define PIECE_COLOR(x) ((x)&8)
 
+// Converts rank and file to square index.
+#define RF(rank, file) ((rank)*8 + (file))
+
 #define CASTLE_WHITE_KING 1
 #define CASTLE_WHITE_QUEEN 2
 #define CASTLE_BLACK_KING 4
