@@ -1,6 +1,7 @@
+#include "board.h"
+
 #include <stdlib.h>
 #include <stdio.h>
-#include "board.h"
 
 char *piece_code_to_string(uint8_t pieceCode)
 {
