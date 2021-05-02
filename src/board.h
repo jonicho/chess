@@ -36,4 +36,6 @@ typedef struct Board {
 	uint8_t side_to_move;
 } Board;
 
+void board_print(Board *board);
+
 #endif
