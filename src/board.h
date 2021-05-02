@@ -31,9 +31,18 @@
 #define PIECE_TYPE(x) ((x)&7)
 #define PIECE_COLOR(x) ((x)&8)
 
+#define CASTLE_WHITE_KING 1
+#define CASTLE_WHITE_QUEEN 2
+#define CASTLE_BLACK_KING 4
+#define CASTLE_BLACK_QUEEN 8
+#define CASTLE_WHITE CASTLE_WHITE_KING | CASTLE_WHITE_QUEEN
+#define CASTLE_BLACK CASTLE_BLACK_KING | CASTLE_BLACK_QUEEN
+#define CASTLE_ALL CASTLE_WHITE | CASTLE_BLACK
+
 typedef struct Board {
 	uint8_t squares[64];
 	uint8_t side_to_move;
+	uint8_t castling_ability;
 } Board;
 
 void board_print(Board *board);
