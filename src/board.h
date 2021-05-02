@@ -43,6 +43,9 @@ typedef struct Board {
 	uint8_t squares[64];
 	uint8_t side_to_move;
 	uint8_t castling_ability;
+	uint8_t en_passant_target_square;
+	uint8_t halfmove_clock;
+	uint16_t fullmove_counter;
 } Board;
 
 void board_print(Board *board);
