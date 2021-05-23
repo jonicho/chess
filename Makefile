@@ -20,7 +20,7 @@ INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 CC = gcc
 CPPFLAGS = $(INC_FLAGS) -MMD -MP
-CFLAGS = -Wall -Wextra -pedantic
+CFLAGS = -Wall -Wextra -pedantic -Werror
 
 ifeq ($(MAKE_RELEASE), 0)
 	CFLAGS := $(CFLAGS) -g
