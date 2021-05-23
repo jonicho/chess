@@ -41,15 +41,14 @@ char *piece_code_to_string(uint8_t pieceCode)
 
 void board_print(Board *board)
 {
-	putchar(' ');
-	for (size_t file = 0; file < 8; file++) {
+	for (int file = 0; file < 8; file++) {
 		putchar('A' + file);
 	}
 	putchar('\n');
 
-	for (size_t rank = 0; rank < 8; rank++) {
+	for (int rank = 7; rank >= 0; rank--) {
 		putchar('1' + rank);
-		for (size_t file = 0; file < 8; file++) {
+		for (int file = 0; file < 8; file++) {
 			printf(piece_code_to_string(
 				board->squares[rank * 8 + file]));
 		}

@@ -1,6 +1,5 @@
 #include "fen.h"
 
-#include <stddef.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -37,18 +36,18 @@ Board *fen_to_board(char *fen)
 {
 	Board *board = malloc(sizeof(Board));
 	memset(board, 0, sizeof(Board));
-	size_t rank = 0;
-	size_t file = 0;
-	size_t i = 0;
+	int rank = 7;
+	int file = 0;
+	int i = 0;
 	char c;
 
 	// piece placement
 	while ((c = fen[i++]) != ' ') {
-		if ((c == '\0') || (file >= 8 && c != '/') || (rank >= 8)) {
+		if ((c == '\0') || (file >= 8 && c != '/') || (rank < 0)) {
 			free(board);
 			return NULL;
 		} else if (c == '/') {
-			rank++;
+			rank--;
 			file = 0;
 		} else if (c == ' ') {
 			break;
