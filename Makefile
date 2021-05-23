@@ -6,7 +6,7 @@ ifeq ($(MAKE_RELEASE), 0)
 	BUILD_DIR = ./build
 else
 	BUILD_DIR = ./build_release
-	TEMP_VAR := $(shell $(make clean MAKE_RELEASE=1))
+	TEMP_VAR := $(shell $(RM) -r $(BUILD_DIR))
 endif
 
 SRC_DIRS = ./src
