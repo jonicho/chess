@@ -1,6 +1,14 @@
 TARGET_EXEC = chess
 
-BUILD_DIR = ./build
+MAKE_RELEASE ?= 0
+
+ifeq ($(MAKE_RELEASE), 0)
+	BUILD_DIR = ./build
+else
+	BUILD_DIR = ./build_release
+	TEMP_VAR := $(shell $(make clean MAKE_RELEASE=1))
+endif
+
 SRC_DIRS = ./src
 
 SRCS := $(shell find $(SRC_DIRS) -name *.c)
@@ -12,7 +20,13 @@ INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 CC = gcc
 CPPFLAGS = $(INC_FLAGS) -MMD -MP
-CFLAGS = -Wall -Wextra -pedantic -g
+CFLAGS = -Wall -Wextra -pedantic
+
+ifeq ($(MAKE_RELEASE), 0)
+	CFLAGS := -g
+else
+	CFLAGS := -O3
+endif
 
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
 	$(CC) $(OBJS) -o $@ $(LDFLAGS)
