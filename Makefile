@@ -23,9 +23,9 @@ CPPFLAGS = $(INC_FLAGS) -MMD -MP
 CFLAGS = -Wall -Wextra -pedantic
 
 ifeq ($(MAKE_RELEASE), 0)
-	CFLAGS := -g
+	CFLAGS := $(CFLAGS) -g
 else
-	CFLAGS := -O3
+	CFLAGS := $(CFLAGS) -O3
 endif
 
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
