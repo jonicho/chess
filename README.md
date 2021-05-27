@@ -36,3 +36,15 @@ To clean all generated build files run
 ```
 make clean
 ```
+
+### Testing
+
+To execute tests that test some parts of the implementation run
+```
+./build/chess test
+```
+or, to run the tests with optimizations, run
+
+```
+./build_release/chess test
+```
