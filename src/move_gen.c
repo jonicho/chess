@@ -9,17 +9,23 @@
 
 void gen_pawn_moves(Move **moves, Board *board, uint8_t square)
 {
-	static const int8_t PAWN_MOVES[] = { 10, 20 };
 	static const int8_t PAWN_CAPTURES[] = { 9, 11 };
 
 	int8_t dir = board->side_to_move == WHITE ? 1 : -1;
-	for (size_t i = 0; i < sizeof(PAWN_MOVES); i++) {
-		uint8_t dest_square = square + (dir * PAWN_MOVES[i]);
+
+	{
+		uint8_t dest_square = square + (dir * 10);
 		uint8_t dest_piece = board->squares[dest_square];
-		if (dest_piece == OFF_BOARD) {
-			continue;
+		if (dest_piece != OFF_BOARD &&
+		    PIECE_TYPE(dest_piece) == EMPTY) {
+			PUSH_MOVE(*moves, square, dest_square);
 		}
-		if (PIECE_TYPE(dest_piece) == EMPTY) {
+	}
+	if (SQUARE_TO_RANK(square) == (board->side_to_move == WHITE ? 1 : 6)) {
+		uint8_t dest_square = square + (dir * 20);
+		uint8_t dest_piece = board->squares[dest_square];
+		if (dest_piece != OFF_BOARD &&
+		    PIECE_TYPE(dest_piece) == EMPTY) {
 			PUSH_MOVE(*moves, square, dest_square);
 		}
 	}
