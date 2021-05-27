@@ -36,6 +36,9 @@
 // Converts rank and file to square index.
 #define RF(rank, file) (((rank) + 2) * 10 + ((file) + 1))
 
+#define SQUARE_TO_FILE(square) (((square) % 10) - 1)
+#define SQUARE_TO_RANK(square) (((square) / 10) - 2)
+
 #define CASTLE_WHITE_KING 1
 #define CASTLE_WHITE_QUEEN 2
 #define CASTLE_BLACK_KING 4
