@@ -35,7 +35,7 @@ uint8_t char_to_piece_code(char c)
 Board *fen_to_board(char *fen)
 {
 	Board *board = malloc(sizeof(Board));
-	memset(board, 0, sizeof(Board));
+	board_init(board);
 	int rank = 7;
 	int file = 0;
 	int i = 0;

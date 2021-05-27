@@ -31,8 +31,10 @@
 #define PIECE_TYPE(x) ((x)&7)
 #define PIECE_COLOR(x) ((x)&8)
 
+#define OFF_BOARD 0xff
+
 // Converts rank and file to square index.
-#define RF(rank, file) ((rank)*8 + (file))
+#define RF(rank, file) (((rank) + 2) * 10 + ((file) + 1))
 
 #define CASTLE_WHITE_KING 1
 #define CASTLE_WHITE_QUEEN 2
@@ -43,7 +45,7 @@
 #define CASTLE_ALL CASTLE_WHITE | CASTLE_BLACK
 
 typedef struct Board {
-	uint8_t squares[64];
+	uint8_t squares[120];
 	uint8_t side_to_move;
 	uint8_t castling_ability;
 	uint8_t en_passant_target_square;
@@ -51,6 +53,13 @@ typedef struct Board {
 	uint16_t fullmove_counter;
 } Board;
 
+// Initializes a board.
+void board_init(Board *board);
+
+// Prints a board.
 void board_print(Board *board);
+
+// Prints a board including the off-board-squares for debugging.
+void board_print_debug(Board *board);
 
 #endif
