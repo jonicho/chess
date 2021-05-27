@@ -1,6 +1,5 @@
 #include "fen.h"
 
-#include <string.h>
 #include <stdlib.h>
 
 uint8_t char_to_piece_code(char c)
