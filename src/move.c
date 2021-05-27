@@ -36,3 +36,18 @@ void make_move(Board *board, Move *move)
 		board->fullmove_counter++;
 	}
 }
+
+char *move_to_string(Move *move)
+{
+	// string can be up to 6 bytes long, including the null-byte
+	char *string = malloc(6);
+
+	string[0] = 'a' + (move->src % 10) - 1;
+	string[1] = '1' + (move->src / 10) - 2;
+	string[2] = 'a' + (move->dst % 10) - 1;
+	string[3] = '1' + (move->dst / 10) - 2;
+	string[4] = '\0';
+	// TODO: promotion
+
+	return string;
+}
