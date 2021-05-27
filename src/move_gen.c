@@ -25,7 +25,8 @@ void gen_pawn_moves(Move **moves, Board *board, uint8_t square)
 		uint8_t dest_square = square + (dir * 20);
 		uint8_t dest_piece = board->squares[dest_square];
 		if (dest_piece != OFF_BOARD &&
-		    PIECE_TYPE(dest_piece) == EMPTY) {
+		    PIECE_TYPE(dest_piece) == EMPTY &&
+		    PIECE_TYPE(board->squares[square + (dir * 10)]) == EMPTY) {
 			PUSH_MOVE(*moves, square, dest_square);
 		}
 	}
