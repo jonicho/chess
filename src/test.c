@@ -25,7 +25,7 @@ bool test_position(char *position_fen, size_t depth, size_t expected_nodes)
 	return true;
 }
 
-void test()
+int test()
 {
 	// test data from https://www.chessprogramming.org/Perft_Results
 
@@ -123,7 +123,9 @@ void test()
 
 	if (all_pass) {
 		printf("test: All tests passed!\n");
+		return 0;
 	} else {
 		printf("test: There were test failures. See above for details.\n");
+		return -1;
 	}
 }

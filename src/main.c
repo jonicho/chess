@@ -12,6 +12,8 @@ int main(int argc, char const *argv[])
 		perft(fen_to_board(FEN_STARTING_POSITION), atol(argv[2]), true);
 		exit(0);
 	} else if (argc > 1 && (strcmp(argv[1], "test") == 0)) {
-		test();
+		int test_result = test();
+		exit(test_result);
 	}
+	exit(-1);
 }
