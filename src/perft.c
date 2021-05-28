@@ -17,15 +17,15 @@ size_t perft(Board *board, size_t depth, bool print)
 
 	size_t nodes = 0;
 
-	Move *moves = malloc(MAX_NUM_MOVES);
+	Move moves[MAX_NUM_MOVES];
 	size_t num_moves = gen_moves(moves, board);
 
-	Board *temp_board = malloc(sizeof(Board));
+	Board temp_board;
 
 	for (size_t i = 0; i < num_moves; i++) {
-		memcpy(temp_board, board, sizeof(Board));
-		make_move(temp_board, moves + i);
-		size_t new_nodes = perft(temp_board, depth - 1, false);
+		memcpy(&temp_board, board, sizeof(Board));
+		make_move(&temp_board, moves + i);
+		size_t new_nodes = perft(&temp_board, depth - 1, false);
 		if (print) {
 			printf("%s: %ld\n", move_to_string(moves + i),
 			       new_nodes);
