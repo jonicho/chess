@@ -129,7 +129,7 @@ void gen_king_moves(Move **moves, Board *board, uint8_t square)
 		if (dest_piece == OFF_BOARD ||
 		    (PIECE_TYPE(dest_piece) != EMPTY &&
 		     PIECE_COLOR(dest_piece) == board->side_to_move)) {
-			break;
+			continue;
 		}
 		PUSH_MOVE(*moves, square, dest_square);
 	}
