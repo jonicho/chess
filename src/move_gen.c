@@ -70,9 +70,14 @@ void gen_bishop_moves(Move **moves, Board *board, uint8_t square)
 		while (1) {
 			dest_square += BISHOP_DIRECTIONS[i];
 			uint8_t dest_piece = board->squares[dest_square];
-			if (dest_piece == OFF_BOARD ||
-			    (PIECE_TYPE(dest_piece) != EMPTY &&
-			     PIECE_COLOR(dest_piece) == board->side_to_move)) {
+			if (dest_piece == OFF_BOARD) {
+				break;
+			}
+			if (PIECE_TYPE(dest_piece) != EMPTY) {
+				if (PIECE_COLOR(dest_piece) !=
+				    board->side_to_move) {
+					PUSH_MOVE(*moves, square, dest_square);
+				}
 				break;
 			}
 			PUSH_MOVE(*moves, square, dest_square);
@@ -89,9 +94,14 @@ void gen_rook_moves(Move **moves, Board *board, uint8_t square)
 		while (1) {
 			dest_square += ROOK_DIRECTIONS[i];
 			uint8_t dest_piece = board->squares[dest_square];
-			if (dest_piece == OFF_BOARD ||
-			    (PIECE_TYPE(dest_piece) != EMPTY &&
-			     PIECE_COLOR(dest_piece) == board->side_to_move)) {
+			if (dest_piece == OFF_BOARD) {
+				break;
+			}
+			if (PIECE_TYPE(dest_piece) != EMPTY) {
+				if (PIECE_COLOR(dest_piece) !=
+				    board->side_to_move) {
+					PUSH_MOVE(*moves, square, dest_square);
+				}
 				break;
 			}
 			PUSH_MOVE(*moves, square, dest_square);
@@ -109,9 +119,14 @@ void gen_queen_moves(Move **moves, Board *board, uint8_t square)
 		while (1) {
 			dest_square += QUEEN_DIRECTIONS[i];
 			uint8_t dest_piece = board->squares[dest_square];
-			if (dest_piece == OFF_BOARD ||
-			    (PIECE_TYPE(dest_piece) != EMPTY &&
-			     PIECE_COLOR(dest_piece) == board->side_to_move)) {
+			if (dest_piece == OFF_BOARD) {
+				break;
+			}
+			if (PIECE_TYPE(dest_piece) != EMPTY) {
+				if (PIECE_COLOR(dest_piece) !=
+				    board->side_to_move) {
+					PUSH_MOVE(*moves, square, dest_square);
+				}
 				break;
 			}
 			PUSH_MOVE(*moves, square, dest_square);
