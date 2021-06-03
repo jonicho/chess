@@ -31,7 +31,7 @@ uint8_t char_to_piece_code(char c)
 	return piece_code;
 }
 
-Board *fen_to_board(char *fen)
+Board *fen_to_board(const char *fen)
 {
 	Board *board = malloc(sizeof(Board));
 	board_init(board);
@@ -51,7 +51,7 @@ Board *fen_to_board(char *fen)
 		} else if (c == ' ') {
 			break;
 		} else if (c >= '1' && c <= '8') {
-			file += c - '1';
+			file += c - '0';
 		} else {
 			uint8_t piece_code = char_to_piece_code(c);
 			if (piece_code == 255) {
