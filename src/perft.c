@@ -2,7 +2,6 @@
 #include "move.h"
 #include "move_gen.h"
 
-#include <stdlib.h>
 #include <stdio.h>
 
 size_t perft(Board *board, size_t depth, bool print)
