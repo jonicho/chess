@@ -2,6 +2,7 @@
 #define _BOARD_H_
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #define WHITE 0
 #define BLACK 8
@@ -56,6 +57,13 @@ typedef struct Board {
 	uint16_t fullmove_counter;
 } Board;
 
+extern const int8_t PAWN_CAPTURES[2];
+extern const int8_t KNIGHT_MOVES[8];
+extern const int8_t BISHOP_DIRECTIONS[4];
+extern const int8_t ROOK_DIRECTIONS[4];
+extern const int8_t QUEEN_DIRECTIONS[8];
+extern const int8_t KING_MOVES[8];
+
 // Initializes a board.
 void board_init(Board *board);
 
@@ -64,5 +72,10 @@ void board_print(Board *board);
 
 // Prints a board including the off-board-squares for debugging.
 void board_print_debug(Board *board);
+
+bool is_square_threatened(Board *board, uint8_t threatened_side,
+			  uint8_t threatened_square);
+
+bool is_king_in_check(Board *board, uint8_t side);
 
 #endif

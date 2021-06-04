@@ -23,6 +23,10 @@ size_t perft(Board *board, size_t depth, bool print)
 	for (size_t i = 0; i < num_moves; i++) {
 		temp_board = *board;
 		make_move(&temp_board, moves + i);
+		if (is_king_in_check(&temp_board,
+				     BLACK ^ temp_board.side_to_move)) {
+			continue;
+		}
 		size_t new_nodes = perft(&temp_board, depth - 1, false);
 		if (print) {
 			printf("%s: %ld\n", move_to_string(moves + i),

@@ -9,8 +9,6 @@
 
 void gen_pawn_moves(Move **moves, Board *board, uint8_t square)
 {
-	static const int8_t PAWN_CAPTURES[] = { 9, 11 };
-
 	int8_t dir = board->side_to_move == WHITE ? 1 : -1;
 
 	{
@@ -43,10 +41,6 @@ void gen_pawn_moves(Move **moves, Board *board, uint8_t square)
 
 void gen_knight_moves(Move **moves, Board *board, uint8_t square)
 {
-	static const int8_t KNIGHT_MOVES[] = {
-		8, 19, 21, 12, -8, -19, -21, -12
-	};
-
 	for (size_t i = 0; i < sizeof(KNIGHT_MOVES); i++) {
 		uint8_t dest_square = square + KNIGHT_MOVES[i];
 		uint8_t dest_piece = board->squares[dest_square];
@@ -63,8 +57,6 @@ void gen_knight_moves(Move **moves, Board *board, uint8_t square)
 
 void gen_bishop_moves(Move **moves, Board *board, uint8_t square)
 {
-	static const int8_t BISHOP_DIRECTIONS[] = { 9, 11, -9, -11 };
-
 	for (size_t i = 0; i < sizeof(BISHOP_DIRECTIONS); i++) {
 		uint8_t dest_square = square;
 		while (1) {
@@ -87,8 +79,6 @@ void gen_bishop_moves(Move **moves, Board *board, uint8_t square)
 
 void gen_rook_moves(Move **moves, Board *board, uint8_t square)
 {
-	static const int8_t ROOK_DIRECTIONS[] = { 10, 1, -10, -1 };
-
 	for (size_t i = 0; i < sizeof(ROOK_DIRECTIONS); i++) {
 		uint8_t dest_square = square;
 		while (1) {
@@ -111,9 +101,6 @@ void gen_rook_moves(Move **moves, Board *board, uint8_t square)
 
 void gen_queen_moves(Move **moves, Board *board, uint8_t square)
 {
-	static const int8_t QUEEN_DIRECTIONS[] = { 9,  10,  11,	 1,
-						   -9, -10, -11, -1 };
-
 	for (size_t i = 0; i < sizeof(QUEEN_DIRECTIONS); i++) {
 		uint8_t dest_square = square;
 		while (1) {
@@ -136,8 +123,6 @@ void gen_queen_moves(Move **moves, Board *board, uint8_t square)
 
 void gen_king_moves(Move **moves, Board *board, uint8_t square)
 {
-	static const int8_t KING_MOVES[] = { 9, 10, 11, 1, -9, -10, -11, -1 };
-
 	for (size_t i = 0; i < sizeof(KING_MOVES); i++) {
 		uint8_t dest_square = square + KING_MOVES[i];
 		uint8_t dest_piece = board->squares[dest_square];

@@ -4,6 +4,13 @@
 #include <stdio.h>
 #include <string.h>
 
+const int8_t PAWN_CAPTURES[2] = { 9, 11 };
+const int8_t KNIGHT_MOVES[8] = { 8, 19, 21, 12, -8, -19, -21, -12 };
+const int8_t BISHOP_DIRECTIONS[4] = { 9, 11, -9, -11 };
+const int8_t ROOK_DIRECTIONS[4] = { 10, 1, -10, -1 };
+const int8_t QUEEN_DIRECTIONS[8] = { 9, 10, 11, 1, -9, -10, -11, -1 };
+const int8_t KING_MOVES[8] = { 9, 10, 11, 1, -9, -10, -11, -1 };
+
 void board_init(Board *board)
 {
 	memset(board, 0, sizeof(Board));
@@ -104,4 +111,96 @@ void board_print_debug(Board *board)
 		}
 		putchar('\n');
 	}
+}
+
+bool is_square_threatened(Board *board, uint8_t threatened_side,
+			  uint8_t threatened_square)
+{
+	// pawn
+	{
+		int8_t dir = threatened_side == WHITE ? 1 : -1;
+		for (size_t i = 0; i < sizeof(PAWN_CAPTURES); i++) {
+			uint8_t square =
+				threatened_square + (dir * PAWN_CAPTURES[i]);
+			uint8_t piece = board->squares[square];
+			if (piece == OFF_BOARD) {
+				continue;
+			}
+			if (piece == (PAWN | (BLACK ^ threatened_side))) {
+				return true;
+			}
+		}
+	}
+
+	// knight
+	for (size_t i = 0; i < sizeof(KNIGHT_MOVES); i++) {
+		uint8_t square = threatened_square + KNIGHT_MOVES[i];
+		uint8_t piece = board->squares[square];
+		if (piece == OFF_BOARD) {
+			continue;
+		}
+		if (piece == (KNIGHT | (BLACK ^ threatened_side))) {
+			return true;
+		}
+	}
+
+	// bishop / diagonal queen
+	for (size_t i = 0; i < sizeof(BISHOP_DIRECTIONS); i++) {
+		uint8_t square = threatened_square;
+		while (1) {
+			square += BISHOP_DIRECTIONS[i];
+			uint8_t piece = board->squares[square];
+			if (piece == OFF_BOARD) {
+				break;
+			}
+			if (PIECE_TYPE(piece) != EMPTY) {
+				if ((PIECE_TYPE(piece) == BISHOP ||
+				     PIECE_TYPE(piece) == QUEEN) &&
+				    PIECE_COLOR(piece) != threatened_side) {
+					return true;
+				}
+				break;
+			}
+		}
+	}
+
+	// rook / horizontal and vertical queen
+	for (size_t i = 0; i < sizeof(ROOK_DIRECTIONS); i++) {
+		uint8_t square = threatened_square;
+		while (1) {
+			square += ROOK_DIRECTIONS[i];
+			uint8_t piece = board->squares[square];
+			if (piece == OFF_BOARD) {
+				break;
+			}
+			if (PIECE_TYPE(piece) != EMPTY) {
+				if ((PIECE_TYPE(piece) == ROOK ||
+				     PIECE_TYPE(piece) == QUEEN) &&
+				    PIECE_COLOR(piece) != threatened_side) {
+					return true;
+				}
+				break;
+			}
+		}
+	}
+	return false;
+}
+
+bool is_king_in_check(Board *board, uint8_t side)
+{
+	uint8_t king_square = 255;
+	for (int rank = 7; rank >= 0 && king_square == 255; rank--) {
+		for (int file = 0; file < 8 && king_square == 255; file++) {
+			uint8_t square = RF(rank, file);
+			if (board->squares[square] == (KING | side)) {
+				king_square = square;
+			}
+		}
+	}
+	if (king_square == 255) {
+		// if the king was not found it is not in check
+		return false;
+	}
+
+	return is_square_threatened(board, side, king_square);
 }
