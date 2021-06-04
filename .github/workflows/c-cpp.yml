@@ -13,7 +13,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: make MAKE_RELEASE=1
+    - name: make
       run: make MAKE_RELEASE=1
     - name: test
       run: ./build_release/chess test
