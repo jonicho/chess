@@ -78,6 +78,8 @@ void make_move(Board *board, Move *move)
 		// if a pawn just made a two-square move
 		board->en_passant_target_square =
 			(move->dst + move->src) / 2; // square "behind" pawn
+	} else {
+		board->en_passant_target_square = 0;
 	}
 
 	// halfmove clock
