@@ -18,6 +18,14 @@ void make_move(Board *board, Move *move)
 				  SQUARE_TO_FILE(move->dst))] = EMPTY;
 	}
 
+	// promotion
+	if (PIECE_TYPE(moving_piece) == PAWN &&
+	    (SQUARE_TO_RANK(move->dst) == 0 ||
+	     SQUARE_TO_RANK(move->dst) == 7)) {
+		board->squares[move->dst] =
+			move->promotion_piece | PIECE_COLOR(moving_piece);
+	}
+
 	// castling
 	if (PIECE_TYPE(moving_piece) == KING &&
 	    abs(move->src - move->dst) == 2) {
@@ -106,8 +114,28 @@ char *move_to_string(Move *move)
 	string[1] = '1' + SQUARE_TO_RANK(move->src);
 	string[2] = 'a' + SQUARE_TO_FILE(move->dst);
 	string[3] = '1' + SQUARE_TO_RANK(move->dst);
-	string[4] = '\0';
-	// TODO: promotion
+	if (move->promotion_piece != EMPTY) {
+		switch (move->promotion_piece) {
+		case QUEEN:
+			string[4] = 'q';
+			break;
+		case ROOK:
+			string[4] = 'r';
+			break;
+		case BISHOP:
+			string[4] = 'b';
+			break;
+		case KNIGHT:
+			string[4] = 'k';
+			break;
+		default:
+			string[4] = '!';
+			break;
+		}
+		string[5] = '\0';
+	} else {
+		string[4] = '\0';
+	}
 
 	return string;
 }

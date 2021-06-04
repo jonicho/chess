@@ -4,6 +4,27 @@
 	{                                                                      \
 		(moves)->src = (src_square);                                   \
 		(moves)->dst = (dst_square);                                   \
+		(moves)->promotion_piece = EMPTY;                              \
+		(moves)++;                                                     \
+	}
+
+#define PUSH_PROMOTION_MOVES(moves, src_square, dst_square)                    \
+	{                                                                      \
+		(moves)->src = (src_square);                                   \
+		(moves)->dst = (dst_square);                                   \
+		(moves)->promotion_piece = QUEEN;                              \
+		(moves)++;                                                     \
+		(moves)->src = (src_square);                                   \
+		(moves)->dst = (dst_square);                                   \
+		(moves)->promotion_piece = ROOK;                               \
+		(moves)++;                                                     \
+		(moves)->src = (src_square);                                   \
+		(moves)->dst = (dst_square);                                   \
+		(moves)->promotion_piece = BISHOP;                             \
+		(moves)++;                                                     \
+		(moves)->src = (src_square);                                   \
+		(moves)->dst = (dst_square);                                   \
+		(moves)->promotion_piece = KNIGHT;                             \
 		(moves)++;                                                     \
 	}
 
@@ -15,7 +36,13 @@ void gen_pawn_moves(Move **moves, Board *board, uint8_t square)
 		uint8_t dest_square = square + (dir * 10);
 		uint8_t dest_piece = board->squares[dest_square];
 		if (PIECE_TYPE(dest_piece) == EMPTY) {
-			PUSH_MOVE(*moves, square, dest_square);
+			if (SQUARE_TO_RANK(dest_square) == 0 ||
+			    SQUARE_TO_RANK(dest_square) == 7) {
+				PUSH_PROMOTION_MOVES(*moves, square,
+						     dest_square);
+			} else {
+				PUSH_MOVE(*moves, square, dest_square);
+			}
 		}
 	}
 	if (SQUARE_TO_RANK(square) == (board->side_to_move == WHITE ? 1 : 6)) {
@@ -32,9 +59,17 @@ void gen_pawn_moves(Move **moves, Board *board, uint8_t square)
 		if (dest_piece == OFF_BOARD) {
 			continue;
 		}
-		if (PIECE_TYPE(dest_piece) != EMPTY &&
-		    PIECE_COLOR(dest_piece) != board->side_to_move) {
-			PUSH_MOVE(*moves, square, dest_square);
+
+		if ((dest_square == board->en_passant_target_square) ||
+		    (PIECE_TYPE(dest_piece) != EMPTY &&
+		     PIECE_COLOR(dest_piece) != board->side_to_move)) {
+			if (SQUARE_TO_RANK(dest_square) == 0 ||
+			    SQUARE_TO_RANK(dest_square) == 7) {
+				PUSH_PROMOTION_MOVES(*moves, square,
+						     dest_square);
+			} else {
+				PUSH_MOVE(*moves, square, dest_square);
+			}
 		}
 	}
 }

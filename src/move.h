@@ -10,7 +10,7 @@
 #define MAX_NUM_MOVES 218
 
 typedef struct Move {
-	uint8_t src, dst;
+	uint8_t src, dst, promotion_piece;
 } Move;
 
 void make_move(Board *board, Move *move);
