@@ -16,7 +16,7 @@ void make_move(Board *board, Move *move)
 
 	// en passant target square
 	if (PIECE_TYPE(moving_piece) == PAWN &&
-	    abs(move->dst - move->src) == 16) {
+	    abs(move->dst - move->src) == 20) {
 		// if a pawn just made a two-square move
 		board->en_passant_target_square =
 			(move->dst + move->src) / 2; // square "behind" pawn
