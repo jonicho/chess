@@ -63,16 +63,24 @@ void make_move(Board *board, Move *move)
 	}
 	if (PIECE_TYPE(captured_piece) == ROOK) {
 		if (PIECE_COLOR(captured_piece) == WHITE) {
-			if (SQUARE_TO_FILE(move->dst) == 0) {
-				board->castling_ability &= ~CASTLE_WHITE_QUEEN;
-			} else if (SQUARE_TO_FILE(move->dst) == 7) {
-				board->castling_ability &= ~CASTLE_WHITE_KING;
+			if (SQUARE_TO_RANK(move->dst) == 0) {
+				if (SQUARE_TO_FILE(move->dst) == 0) {
+					board->castling_ability &=
+						~CASTLE_WHITE_QUEEN;
+				} else if (SQUARE_TO_FILE(move->dst) == 7) {
+					board->castling_ability &=
+						~CASTLE_WHITE_KING;
+				}
 			}
 		} else {
-			if (SQUARE_TO_FILE(move->dst) == 0) {
-				board->castling_ability &= ~CASTLE_BLACK_QUEEN;
-			} else if (SQUARE_TO_FILE(move->dst) == 7) {
-				board->castling_ability &= ~CASTLE_BLACK_KING;
+			if (SQUARE_TO_RANK(move->dst) == 7) {
+				if (SQUARE_TO_FILE(move->dst) == 0) {
+					board->castling_ability &=
+						~CASTLE_BLACK_QUEEN;
+				} else if (SQUARE_TO_FILE(move->dst) == 7) {
+					board->castling_ability &=
+						~CASTLE_BLACK_KING;
+				}
 			}
 		}
 	}
