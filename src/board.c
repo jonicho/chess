@@ -70,8 +70,9 @@ void board_print(Board *board)
 		putchar('1' + rank);
 		for (int file = 0; file < 8; file++) {
 			putchar(' ');
-			puts(piece_code_to_string(
-				board->squares[RF(rank, file)]));
+			fputs(piece_code_to_string(
+				      board->squares[RF(rank, file)]),
+			      stdout);
 		}
 		putchar('\n');
 	}
@@ -97,8 +98,9 @@ void board_print_debug(Board *board)
 
 		for (int file = 0; file < 10; file++) {
 			putchar(' ');
-			puts(piece_code_to_string(
-				board->squares[rank * 10 + file]));
+			fputs(piece_code_to_string(
+				      board->squares[rank * 10 + file]),
+			      stdout);
 		}
 		putchar('\n');
 	}
