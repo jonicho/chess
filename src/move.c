@@ -30,6 +30,45 @@ void make_move(Board *board, Move *move)
 		board->squares[rook_src_square] = EMPTY;
 	}
 
+	// remove castling ability
+	if (PIECE_TYPE(moving_piece) == KING) {
+		if (PIECE_COLOR(moving_piece) == WHITE) {
+			board->castling_ability &= ~CASTLE_WHITE;
+		} else {
+			board->castling_ability &= ~CASTLE_BLACK;
+		}
+	}
+	if (PIECE_TYPE(moving_piece) == ROOK) {
+		if (PIECE_COLOR(moving_piece) == WHITE) {
+			if (SQUARE_TO_FILE(move->src) == 0) {
+				board->castling_ability &= ~CASTLE_WHITE_QUEEN;
+			} else if (SQUARE_TO_FILE(move->src) == 7) {
+				board->castling_ability &= ~CASTLE_WHITE_KING;
+			}
+		} else {
+			if (SQUARE_TO_FILE(move->src) == 0) {
+				board->castling_ability &= ~CASTLE_BLACK_QUEEN;
+			} else if (SQUARE_TO_FILE(move->src) == 7) {
+				board->castling_ability &= ~CASTLE_BLACK_KING;
+			}
+		}
+	}
+	if (PIECE_TYPE(captured_piece) == ROOK) {
+		if (PIECE_COLOR(captured_piece) == WHITE) {
+			if (SQUARE_TO_FILE(move->dst) == 0) {
+				board->castling_ability &= ~CASTLE_WHITE_QUEEN;
+			} else if (SQUARE_TO_FILE(move->dst) == 7) {
+				board->castling_ability &= ~CASTLE_WHITE_KING;
+			}
+		} else {
+			if (SQUARE_TO_FILE(move->dst) == 0) {
+				board->castling_ability &= ~CASTLE_BLACK_QUEEN;
+			} else if (SQUARE_TO_FILE(move->dst) == 7) {
+				board->castling_ability &= ~CASTLE_BLACK_KING;
+			}
+		}
+	}
+
 	// flip side to move
 	board->side_to_move ^= BLACK;
 
