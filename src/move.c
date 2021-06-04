@@ -18,6 +18,18 @@ void make_move(Board *board, Move *move)
 				  SQUARE_TO_FILE(move->dst))] = EMPTY;
 	}
 
+	// castling
+	if (PIECE_TYPE(moving_piece) == KING &&
+	    abs(move->src - move->dst) == 2) {
+		uint8_t rook_src_square =
+			RF(PIECE_COLOR(moving_piece) == WHITE ? 0 : 7,
+			   move->dst > move->src ? 7 : 0);
+		uint8_t rook_dst_square = (move->dst + move->src) / 2;
+		board->squares[rook_dst_square] =
+			board->squares[rook_src_square];
+		board->squares[rook_src_square] = EMPTY;
+	}
+
 	// flip side to move
 	board->side_to_move ^= BLACK;
 
