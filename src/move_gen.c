@@ -173,6 +173,8 @@ void gen_king_moves(Move **moves, Board *board, uint8_t square)
 		    board->squares[RF(0, 5)] == EMPTY &&
 		    board->squares[RF(0, 6)] == EMPTY &&
 		    !is_square_threatened(board, board->side_to_move,
+					  RF(0, 4)) &&
+		    !is_square_threatened(board, board->side_to_move,
 					  RF(0, 5)) &&
 		    !is_square_threatened(board, board->side_to_move,
 					  RF(0, 6))) {
@@ -185,7 +187,9 @@ void gen_king_moves(Move **moves, Board *board, uint8_t square)
 		    !is_square_threatened(board, board->side_to_move,
 					  RF(0, 2)) &&
 		    !is_square_threatened(board, board->side_to_move,
-					  RF(0, 3))) {
+					  RF(0, 3)) &&
+		    !is_square_threatened(board, board->side_to_move,
+					  RF(0, 4))) {
 			PUSH_MOVE(*moves, RF(0, 4), RF(0, 2));
 		}
 	}
@@ -193,6 +197,8 @@ void gen_king_moves(Move **moves, Board *board, uint8_t square)
 		if ((board->castling_ability & CASTLE_BLACK_KING) &&
 		    board->squares[RF(7, 5)] == EMPTY &&
 		    board->squares[RF(7, 6)] == EMPTY &&
+		    !is_square_threatened(board, board->side_to_move,
+					  RF(7, 4)) &&
 		    !is_square_threatened(board, board->side_to_move,
 					  RF(7, 5)) &&
 		    !is_square_threatened(board, board->side_to_move,
@@ -206,7 +212,9 @@ void gen_king_moves(Move **moves, Board *board, uint8_t square)
 		    !is_square_threatened(board, board->side_to_move,
 					  RF(7, 2)) &&
 		    !is_square_threatened(board, board->side_to_move,
-					  RF(7, 3))) {
+					  RF(7, 3)) &&
+		    !is_square_threatened(board, board->side_to_move,
+					  RF(7, 4))) {
 			PUSH_MOVE(*moves, RF(7, 4), RF(7, 2));
 		}
 	}
