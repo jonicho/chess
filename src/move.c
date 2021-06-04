@@ -11,6 +11,13 @@ void make_move(Board *board, Move *move)
 	board->squares[move->dst] = moving_piece;
 	board->squares[move->src] = EMPTY;
 
+	// en passant
+	if (PIECE_TYPE(moving_piece) == PAWN &&
+	    move->dst == board->en_passant_target_square) {
+		board->squares[RF(SQUARE_TO_RANK(move->src),
+				  SQUARE_TO_FILE(move->dst))] = EMPTY;
+	}
+
 	// flip side to move
 	board->side_to_move ^= BLACK;
 
