@@ -3,7 +3,6 @@
 #include "move_gen.h"
 
 #include <stdlib.h>
-#include <string.h>
 #include <stdio.h>
 
 size_t perft(Board *board, size_t depth, bool print)
@@ -23,7 +22,7 @@ size_t perft(Board *board, size_t depth, bool print)
 	Board temp_board;
 
 	for (size_t i = 0; i < num_moves; i++) {
-		memcpy(&temp_board, board, sizeof(Board));
+		temp_board = *board;
 		make_move(&temp_board, moves + i);
 		size_t new_nodes = perft(&temp_board, depth - 1, false);
 		if (print) {
