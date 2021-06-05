@@ -18,4 +18,8 @@ void make_move(Board *board, Move move);
 // Converts a move to a string using pure coordinate notation.
 char *move_to_string(Move move);
 
+// Converts a string with pure coordinate notation to a move.
+// Returns NULL if the string is not in valid pure coordinate notation.
+Move *move_from_string(const char *string);
+
 #endif
