@@ -134,7 +134,7 @@ char *move_to_string(Move move)
 		string[4] = 'b';
 		break;
 	case KNIGHT:
-		string[4] = 'k';
+		string[4] = 'n';
 		break;
 	default:
 		string[4] = '!';
