@@ -5,9 +5,8 @@
 
 #include <stdint.h>
 
-// The maximum number of moves per position.
-// https://www.chessprogramming.org/Chess_Position
-#define MAX_NUM_MOVES 218
+// The maximum number of pseudo legal moves per position.
+#define MAX_NUM_PSEUDO_LEGAL_MOVES 256
 
 typedef struct Move {
 	uint8_t src, dst, promotion_piece;
