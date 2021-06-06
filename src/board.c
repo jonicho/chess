@@ -64,7 +64,7 @@ char *piece_code_to_string(uint8_t pieceCode)
 	}
 }
 
-void board_print(Board *board)
+void board_print(const Board *board)
 {
 	putchar(' ');
 	for (int file = 0; file < 8; file++) {
@@ -85,7 +85,7 @@ void board_print(Board *board)
 	}
 }
 
-void board_print_debug(Board *board)
+void board_print_debug(const Board *board)
 {
 	putchar(' ');
 	putchar(' ');
@@ -113,7 +113,7 @@ void board_print_debug(Board *board)
 	}
 }
 
-bool is_square_threatened(Board *board, uint8_t threatened_side,
+bool is_square_threatened(const Board *board, uint8_t threatened_side,
 			  uint8_t threatened_square)
 {
 	// pawn
@@ -186,7 +186,7 @@ bool is_square_threatened(Board *board, uint8_t threatened_side,
 	return false;
 }
 
-bool is_king_in_check(Board *board, uint8_t side)
+bool is_king_in_check(const Board *board, uint8_t side)
 {
 	uint8_t king_square = 255;
 	for (int rank = 7; rank >= 0 && king_square == 255; rank--) {

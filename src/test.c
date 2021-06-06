@@ -82,7 +82,7 @@ TestData test_data_list[] = {
 
 #define NUM_TEST_DATA (sizeof(test_data_list) / sizeof(TestData))
 
-bool test_position(TestData *test_data)
+bool test_position(const TestData *test_data)
 {
 	Board *board = fen_to_board(test_data->position_fen);
 	if (board == NULL) {

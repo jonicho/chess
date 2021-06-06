@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 
-size_t perft(Board *board, size_t depth, bool print)
+size_t perft(const Board *board, size_t depth, bool print)
 {
 	if (depth == 0) {
 		if (print) {

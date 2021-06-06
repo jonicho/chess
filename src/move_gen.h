@@ -8,6 +8,6 @@
 
 // Generates all pseudo legal moves.
 // Returns the number of moves generated.
-size_t gen_moves(Move *moves, Board *board);
+size_t gen_moves(Move *moves, const Board *board);
 
 #endif

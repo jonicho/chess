@@ -68,14 +68,14 @@ extern const int8_t KING_MOVES[8];
 void board_init(Board *board);
 
 // Prints a board.
-void board_print(Board *board);
+void board_print(const Board *board);
 
 // Prints a board including the off-board-squares for debugging.
-void board_print_debug(Board *board);
+void board_print_debug(const Board *board);
 
-bool is_square_threatened(Board *board, uint8_t threatened_side,
+bool is_square_threatened(const Board *board, uint8_t threatened_side,
 			  uint8_t threatened_square);
 
-bool is_king_in_check(Board *board, uint8_t side);
+bool is_king_in_check(const Board *board, uint8_t side);
 
 #endif

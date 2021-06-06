@@ -28,7 +28,7 @@
 		(moves)++;                                                     \
 	}
 
-void gen_pawn_moves(Move **moves, Board *board, uint8_t square)
+void gen_pawn_moves(Move **moves, const Board *board, uint8_t square)
 {
 	int8_t dir = board->side_to_move == WHITE ? 1 : -1;
 
@@ -74,7 +74,7 @@ void gen_pawn_moves(Move **moves, Board *board, uint8_t square)
 	}
 }
 
-void gen_knight_moves(Move **moves, Board *board, uint8_t square)
+void gen_knight_moves(Move **moves, const Board *board, uint8_t square)
 {
 	for (size_t i = 0; i < sizeof(KNIGHT_MOVES); i++) {
 		uint8_t dest_square = square + KNIGHT_MOVES[i];
@@ -90,7 +90,7 @@ void gen_knight_moves(Move **moves, Board *board, uint8_t square)
 	}
 }
 
-void gen_bishop_moves(Move **moves, Board *board, uint8_t square)
+void gen_bishop_moves(Move **moves, const Board *board, uint8_t square)
 {
 	for (size_t i = 0; i < sizeof(BISHOP_DIRECTIONS); i++) {
 		uint8_t dest_square = square;
@@ -112,7 +112,7 @@ void gen_bishop_moves(Move **moves, Board *board, uint8_t square)
 	}
 }
 
-void gen_rook_moves(Move **moves, Board *board, uint8_t square)
+void gen_rook_moves(Move **moves, const Board *board, uint8_t square)
 {
 	for (size_t i = 0; i < sizeof(ROOK_DIRECTIONS); i++) {
 		uint8_t dest_square = square;
@@ -134,7 +134,7 @@ void gen_rook_moves(Move **moves, Board *board, uint8_t square)
 	}
 }
 
-void gen_queen_moves(Move **moves, Board *board, uint8_t square)
+void gen_queen_moves(Move **moves, const Board *board, uint8_t square)
 {
 	for (size_t i = 0; i < sizeof(QUEEN_DIRECTIONS); i++) {
 		uint8_t dest_square = square;
@@ -156,7 +156,7 @@ void gen_queen_moves(Move **moves, Board *board, uint8_t square)
 	}
 }
 
-void gen_king_moves(Move **moves, Board *board, uint8_t square)
+void gen_king_moves(Move **moves, const Board *board, uint8_t square)
 {
 	for (size_t i = 0; i < sizeof(KING_MOVES); i++) {
 		uint8_t dest_square = square + KING_MOVES[i];
@@ -170,7 +170,7 @@ void gen_king_moves(Move **moves, Board *board, uint8_t square)
 	}
 }
 
-void gen_castling_moves(Move **moves, Board *board)
+void gen_castling_moves(Move **moves, const Board *board)
 {
 	if (board->side_to_move == WHITE) {
 		if ((board->castling_ability & CASTLE_WHITE_KING) &&
@@ -224,7 +224,7 @@ void gen_castling_moves(Move **moves, Board *board)
 	}
 }
 
-size_t gen_moves(Move *moves, Board *board)
+size_t gen_moves(Move *moves, const Board *board)
 {
 	Move *initial_moves = moves;
 	for (int rank = 7; rank >= 0; rank--) {

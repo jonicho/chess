@@ -6,6 +6,6 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-size_t perft(Board *board, size_t depth, bool print);
+size_t perft(const Board *board, size_t depth, bool print);
 
 #endif
