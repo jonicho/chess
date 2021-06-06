@@ -168,6 +168,10 @@ void gen_king_moves(Move **moves, Board *board, uint8_t square)
 		}
 		PUSH_MOVE(*moves, square, dest_square);
 	}
+}
+
+void gen_castling_moves(Move **moves, Board *board)
+{
 	if (board->side_to_move == WHITE) {
 		if ((board->castling_ability & CASTLE_WHITE_KING) &&
 		    board->squares[RF(0, 5)] == EMPTY &&
@@ -257,5 +261,7 @@ size_t gen_moves(Move *moves, Board *board)
 			}
 		}
 	}
+	gen_castling_moves(&moves, board);
+
 	return moves - initial_moves;
 }
