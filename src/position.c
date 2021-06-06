@@ -1,4 +1,4 @@
-#include "board.h"
+#include "position.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -11,18 +11,18 @@ const int8_t ROOK_DIRECTIONS[4] = { 10, 1, -10, -1 };
 const int8_t QUEEN_DIRECTIONS[8] = { 9, 10, 11, 1, -9, -10, -11, -1 };
 const int8_t KING_MOVES[8] = { 9, 10, 11, 1, -9, -10, -11, -1 };
 
-void board_init(Board *board)
+void position_init(Position *position)
 {
-	memset(board, 0, sizeof(Board));
+	memset(position, 0, sizeof(Position));
 	for (size_t i = 0; i < 20; i++) {
-		board->squares[i] = OFF_BOARD;
+		position->squares[i] = OFF_BOARD;
 	}
 	for (size_t i = 0; i < 10; i++) {
-		board->squares[(i + 2) * 10] = OFF_BOARD;
-		board->squares[(i + 2) * 10 + 9] = OFF_BOARD;
+		position->squares[(i + 2) * 10] = OFF_BOARD;
+		position->squares[(i + 2) * 10 + 9] = OFF_BOARD;
 	}
 	for (size_t i = 0; i < 20; i++) {
-		board->squares[i + 100] = OFF_BOARD;
+		position->squares[i + 100] = OFF_BOARD;
 	}
 }
 
@@ -64,7 +64,7 @@ char *piece_code_to_string(uint8_t pieceCode)
 	}
 }
 
-void board_print(const Board *board)
+void position_print(const Position *position)
 {
 	putchar(' ');
 	for (int file = 0; file < 8; file++) {
@@ -78,14 +78,14 @@ void board_print(const Board *board)
 		for (int file = 0; file < 8; file++) {
 			putchar(' ');
 			fputs(piece_code_to_string(
-				      board->squares[RF(rank, file)]),
+				      position->squares[RF(rank, file)]),
 			      stdout);
 		}
 		putchar('\n');
 	}
 }
 
-void board_print_debug(const Board *board)
+void position_print_debug(const Position *position)
 {
 	putchar(' ');
 	putchar(' ');
@@ -106,14 +106,14 @@ void board_print_debug(const Board *board)
 		for (int file = 0; file < 10; file++) {
 			putchar(' ');
 			fputs(piece_code_to_string(
-				      board->squares[rank * 10 + file]),
+				      position->squares[rank * 10 + file]),
 			      stdout);
 		}
 		putchar('\n');
 	}
 }
 
-bool is_square_threatened(const Board *board, uint8_t threatened_side,
+bool is_square_threatened(const Position *position, uint8_t threatened_side,
 			  uint8_t threatened_square)
 {
 	// pawn
@@ -122,7 +122,7 @@ bool is_square_threatened(const Board *board, uint8_t threatened_side,
 		for (size_t i = 0; i < sizeof(PAWN_CAPTURES); i++) {
 			uint8_t square =
 				threatened_square + (dir * PAWN_CAPTURES[i]);
-			uint8_t piece = board->squares[square];
+			uint8_t piece = position->squares[square];
 			if (piece == OFF_BOARD) {
 				continue;
 			}
@@ -135,7 +135,7 @@ bool is_square_threatened(const Board *board, uint8_t threatened_side,
 	// knight
 	for (size_t i = 0; i < sizeof(KNIGHT_MOVES); i++) {
 		uint8_t square = threatened_square + KNIGHT_MOVES[i];
-		uint8_t piece = board->squares[square];
+		uint8_t piece = position->squares[square];
 		if (piece == OFF_BOARD) {
 			continue;
 		}
@@ -149,7 +149,7 @@ bool is_square_threatened(const Board *board, uint8_t threatened_side,
 		uint8_t square = threatened_square;
 		while (1) {
 			square += BISHOP_DIRECTIONS[i];
-			uint8_t piece = board->squares[square];
+			uint8_t piece = position->squares[square];
 			if (piece == OFF_BOARD) {
 				break;
 			}
@@ -169,7 +169,7 @@ bool is_square_threatened(const Board *board, uint8_t threatened_side,
 		uint8_t square = threatened_square;
 		while (1) {
 			square += ROOK_DIRECTIONS[i];
-			uint8_t piece = board->squares[square];
+			uint8_t piece = position->squares[square];
 			if (piece == OFF_BOARD) {
 				break;
 			}
@@ -186,13 +186,13 @@ bool is_square_threatened(const Board *board, uint8_t threatened_side,
 	return false;
 }
 
-bool is_king_in_check(const Board *board, uint8_t side)
+bool is_king_in_check(const Position *position, uint8_t side)
 {
 	uint8_t king_square = 255;
 	for (int rank = 7; rank >= 0 && king_square == 255; rank--) {
 		for (int file = 0; file < 8 && king_square == 255; file++) {
 			uint8_t square = RF(rank, file);
-			if (board->squares[square] == (KING | side)) {
+			if (position->squares[square] == (KING | side)) {
 				king_square = square;
 			}
 		}
@@ -202,5 +202,5 @@ bool is_king_in_check(const Board *board, uint8_t side)
 		return false;
 	}
 
-	return is_square_threatened(board, side, king_square);
+	return is_square_threatened(position, side, king_square);
 }

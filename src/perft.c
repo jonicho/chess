@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 
-size_t perft(const Board *board, size_t depth, bool print)
+size_t perft(const Position *position, size_t depth, bool print)
 {
 	if (depth == 0) {
 		if (print) {
@@ -16,18 +16,18 @@ size_t perft(const Board *board, size_t depth, bool print)
 	size_t nodes = 0;
 
 	Move moves[MAX_NUM_MOVES];
-	size_t num_moves = gen_moves(moves, board);
+	size_t num_moves = gen_moves(moves, position);
 
-	Board temp_board;
+	Position temp_position;
 
 	for (size_t i = 0; i < num_moves; i++) {
-		temp_board = *board;
-		make_move(&temp_board, moves[i]);
-		if (is_king_in_check(&temp_board,
-				     BLACK ^ temp_board.side_to_move)) {
+		temp_position = *position;
+		make_move(&temp_position, moves[i]);
+		if (is_king_in_check(&temp_position,
+				     BLACK ^ temp_position.side_to_move)) {
 			continue;
 		}
-		size_t new_nodes = perft(&temp_board, depth - 1, false);
+		size_t new_nodes = perft(&temp_position, depth - 1, false);
 		if (print) {
 			printf("%s: %ld\n", move_to_string(moves[i]),
 			       new_nodes);

@@ -1,7 +1,7 @@
 #ifndef _MOVE_H_
 #define _MOVE_H_
 
-#include "board.h"
+#include "position.h"
 
 #include <stdint.h>
 
@@ -13,7 +13,7 @@ typedef struct Move {
 	uint8_t src, dst, promotion_piece;
 } Move;
 
-void make_move(Board *board, Move move);
+void make_move(Position *position, Move move);
 
 // Converts a move to a string using pure coordinate notation.
 char *move_to_string(Move move);

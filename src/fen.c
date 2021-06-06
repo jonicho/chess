@@ -31,10 +31,10 @@ uint8_t char_to_piece_code(char c)
 	return piece_code;
 }
 
-Board *fen_to_board(const char *fen)
+Position *fen_to_position(const char *fen)
 {
-	Board *board = malloc(sizeof(Board));
-	board_init(board);
+	Position *position = malloc(sizeof(Position));
+	position_init(position);
 	int rank = 7;
 	int file = 0;
 	int i = 0;
@@ -43,7 +43,7 @@ Board *fen_to_board(const char *fen)
 	// piece placement
 	while ((c = fen[i++]) != ' ') {
 		if ((c == '\0') || (file >= 8 && c != '/') || (rank < 0)) {
-			free(board);
+			free(position);
 			return NULL;
 		} else if (c == '/') {
 			rank--;
@@ -55,27 +55,27 @@ Board *fen_to_board(const char *fen)
 		} else {
 			uint8_t piece_code = char_to_piece_code(c);
 			if (piece_code == 255) {
-				free(board);
+				free(position);
 				return NULL;
 			}
-			board->squares[RF(rank, file++)] = piece_code;
+			position->squares[RF(rank, file++)] = piece_code;
 		}
 	}
 
 	// side to move
 	switch (fen[i++]) {
 	case 'w':
-		board->side_to_move = WHITE;
+		position->side_to_move = WHITE;
 		break;
 	case 'b':
-		board->side_to_move = BLACK;
+		position->side_to_move = BLACK;
 		break;
 	default:
-		free(board);
+		free(position);
 		return NULL;
 	}
 	if (fen[i++] != ' ') {
-		free(board);
+		free(position);
 		return NULL;
 	}
 
@@ -83,7 +83,7 @@ Board *fen_to_board(const char *fen)
 	if (fen[i] == '-') {
 		i++;
 		if (fen[i++] != ' ') {
-			free(board);
+			free(position);
 			return NULL;
 		}
 	} else {
@@ -104,57 +104,58 @@ Board *fen_to_board(const char *fen)
 				break;
 
 			default:
-				free(board);
+				free(position);
 				return NULL;
 			}
-			if (board->castling_ability & castling_ability_to_add) {
-				free(board);
+			if (position->castling_ability &
+			    castling_ability_to_add) {
+				free(position);
 				return NULL;
 			}
-			board->castling_ability |= castling_ability_to_add;
+			position->castling_ability |= castling_ability_to_add;
 		}
 	}
 
 	// en passant target square
 	c = fen[i++];
 	if (c >= 'a' && c <= 'h' && (fen[i] == '3' || fen[i] == '6')) {
-		board->en_passant_target_square = RF(fen[i] - '1', c - 'a');
+		position->en_passant_target_square = RF(fen[i] - '1', c - 'a');
 		i++;
 	} else if (c != '-') {
-		free(board);
+		free(position);
 		return NULL;
 	}
 	if (fen[i++] != ' ') {
-		free(board);
+		free(position);
 		return NULL;
 	}
 
 	// halfmove clock
 	while ((c = fen[i++]) != ' ') {
 		if (c >= '0' && c <= '9') {
-			board->halfmove_clock *= 10;
-			board->halfmove_clock += c - '0';
+			position->halfmove_clock *= 10;
+			position->halfmove_clock += c - '0';
 		} else {
-			free(board);
+			free(position);
 			return NULL;
 		}
 	}
 
 	// fullmove counter
 	if (fen[i] == '0') {
-		free(board);
+		free(position);
 		return NULL;
 	}
 
 	while ((c = fen[i++]) != '\0') {
 		if (c >= '0' && c <= '9') {
-			board->fullmove_counter *= 10;
-			board->fullmove_counter += c - '0';
+			position->fullmove_counter *= 10;
+			position->fullmove_counter += c - '0';
 		} else {
-			free(board);
+			free(position);
 			return NULL;
 		}
 	}
 
-	return board;
+	return position;
 }

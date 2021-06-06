@@ -1,6 +1,6 @@
 #include "test.h"
 
-#include "board.h"
+#include "position.h"
 #include "fen.h"
 #include "perft.h"
 
@@ -84,14 +84,14 @@ TestData test_data_list[] = {
 
 bool test_position(const TestData *test_data)
 {
-	Board *board = fen_to_board(test_data->position_fen);
-	if (board == NULL) {
+	Position *position = fen_to_position(test_data->position_fen);
+	if (position == NULL) {
 		printf("test: Failed to parse fen string: %s\n",
 		       test_data->position_fen);
 		return false;
 	}
 
-	size_t actual_nodes = perft(board, test_data->depth, false);
+	size_t actual_nodes = perft(position, test_data->depth, false);
 	if (actual_nodes != test_data->expected_nodes) {
 		printf("test: Expected %ld nodes, but got %ld nodes at depth %ld with position %s\n",
 		       test_data->expected_nodes, actual_nodes,

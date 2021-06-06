@@ -1,5 +1,5 @@
-#ifndef _BOARD_H_
-#define _BOARD_H_
+#ifndef _POSITION_H_
+#define _POSITION_H_
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -48,14 +48,14 @@
 #define CASTLE_BLACK (CASTLE_BLACK_KING | CASTLE_BLACK_QUEEN)
 #define CASTLE_ALL (CASTLE_WHITE | CASTLE_BLACK)
 
-typedef struct Board {
+typedef struct Position {
 	uint8_t squares[120];
 	uint8_t side_to_move;
 	uint8_t castling_ability;
 	uint8_t en_passant_target_square;
 	uint8_t halfmove_clock;
 	uint16_t fullmove_counter;
-} Board;
+} Position;
 
 extern const int8_t PAWN_CAPTURES[2];
 extern const int8_t KNIGHT_MOVES[8];
@@ -64,18 +64,18 @@ extern const int8_t ROOK_DIRECTIONS[4];
 extern const int8_t QUEEN_DIRECTIONS[8];
 extern const int8_t KING_MOVES[8];
 
-// Initializes a board.
-void board_init(Board *board);
+// Initializes a position.
+void position_init(Position *position);
 
-// Prints a board.
-void board_print(const Board *board);
+// Prints a position.
+void position_print(const Position *position);
 
-// Prints a board including the off-board-squares for debugging.
-void board_print_debug(const Board *board);
+// Prints a position including the off-board-squares for debugging.
+void position_print_debug(const Position *position);
 
-bool is_square_threatened(const Board *board, uint8_t threatened_side,
+bool is_square_threatened(const Position *position, uint8_t threatened_side,
 			  uint8_t threatened_square);
 
-bool is_king_in_check(const Board *board, uint8_t side);
+bool is_king_in_check(const Position *position, uint8_t side);
 
 #endif
