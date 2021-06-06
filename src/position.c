@@ -66,13 +66,6 @@ char *piece_code_to_string(uint8_t pieceCode)
 
 void position_print(const Position *position)
 {
-	putchar(' ');
-	for (int file = 0; file < 8; file++) {
-		putchar(' ');
-		putchar('A' + file);
-	}
-	putchar('\n');
-
 	for (int rank = 7; rank >= 0; rank--) {
 		putchar('1' + rank);
 		for (int file = 0; file < 8; file++) {
@@ -83,19 +76,16 @@ void position_print(const Position *position)
 		}
 		putchar('\n');
 	}
+	putchar(' ');
+	for (int file = 0; file < 8; file++) {
+		putchar(' ');
+		putchar('a' + file);
+	}
+	putchar('\n');
 }
 
 void position_print_debug(const Position *position)
 {
-	putchar(' ');
-	putchar(' ');
-	putchar(' ');
-	for (int file = 0; file < 8; file++) {
-		putchar(' ');
-		putchar('A' + file);
-	}
-	putchar('\n');
-
 	for (int rank = 11; rank >= 0; rank--) {
 		if (rank >= 2 && rank <= 9) {
 			putchar('1' + rank - 2);
@@ -111,6 +101,14 @@ void position_print_debug(const Position *position)
 		}
 		putchar('\n');
 	}
+	putchar(' ');
+	putchar(' ');
+	putchar(' ');
+	for (int file = 0; file < 8; file++) {
+		putchar(' ');
+		putchar('a' + file);
+	}
+	putchar('\n');
 }
 
 bool is_square_threatened(const Position *position, uint8_t threatened_side,
