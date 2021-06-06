@@ -183,6 +183,16 @@ bool is_square_threatened(const Position *position, uint8_t threatened_side,
 			}
 		}
 	}
+
+	// king
+	for (size_t i = 0; i < sizeof(KING_MOVES); i++) {
+		uint8_t square = threatened_square + KING_MOVES[i];
+		uint8_t piece = position->squares[square];
+		if (piece != OFF_BOARD && PIECE_TYPE(piece) == KING &&
+		    PIECE_COLOR(piece) != threatened_side) {
+			return true;
+		}
+	}
 	return false;
 }
 
