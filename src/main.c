@@ -2,9 +2,43 @@
 #include "fen.h"
 #include "perft.h"
 #include "test.h"
+#include "game.h"
 
 #include <stdlib.h>
+#include <stddef.h>
+#include <stdio.h>
 #include <string.h>
+
+void play_game()
+{
+	Game game;
+	game_init(&game);
+	bool was_move_invalid = false;
+	while (true) {
+		if (was_move_invalid) {
+			printf("Invalid move, try again: ");
+		} else {
+			position_print(game.current_position);
+			printf("\nIt's %s's turn. Make a move: ",
+			       game.current_position->side_to_move == WHITE ?
+					     "white" :
+					     "black");
+		}
+
+		size_t n = 0;
+		char *line = NULL;
+		ssize_t nread = getline(&line, &n, stdin);
+
+		if (nread == -1) {
+			printf("There was an error reading the input.\n");
+			return;
+		}
+		line[--nread] = '\0'; // remove trailing newline
+		Move *move = move_from_string(line);
+		was_move_invalid =
+			move == NULL || !game_make_move(&game, *move);
+	}
+}
 
 int main(int argc, char const *argv[])
 {
@@ -17,5 +51,5 @@ int main(int argc, char const *argv[])
 		int test_result = test();
 		exit(test_result);
 	}
-	exit(-1);
+	play_game();
 }
