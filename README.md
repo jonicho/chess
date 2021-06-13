@@ -9,42 +9,55 @@ First, clone the repository with
 $ git clone https://github.com/jonicho/chess
 ```
 
-### Compile with optimizations for release
+### Compilation with optimizations for release
 
 For compilation with optimizations for release compile with:
 ```
-make MAKE_RELEASE=1
+$ make MAKE_RELEASE=1
 ```
 This compiles the whole project every time it is run.
 The compiled binary and object files will be in `./build_release`.
 
 To clean all generated build files run
 ```
-make clean MAKE_RELEASE=1
+$ make clean MAKE_RELEASE=1
 ```
 
-### Compile for development
+### Compilation for development
 
 To compile with debug symbols for development compile with:
 ```
-make
+$ make
 ```
 This only compiles files that changed.
 The compiled binary and object files will be in `./build`.
 
 To clean all generated build files run
 ```
-make clean
+$ make clean
 ```
+
+### Usage
+To play a game against the computer, simply run:
+```
+$ ./build/chess test
+```
+or 
+```
+$ ./build_release/chess test
+```
+depending on whether you compiled for release or development.
+
+Enter your moves in pure coordinate notation.
 
 ### Testing
 
 To execute tests that test some parts of the implementation run
 ```
-./build/chess test
+$ ./build/chess test
 ```
 or, to run the tests with optimizations, run
 
 ```
-./build_release/chess test
+$ ./build_release/chess test
 ```
