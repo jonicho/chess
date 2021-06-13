@@ -17,6 +17,7 @@ void play_game()
 	bool was_move_invalid = false;
 	while (true) {
 		if (game.current_position->side_to_move == BLACK) {
+			position_print_board(game.current_position);
 			Move best_move;
 			int eval = search_for_best_move(game.current_position,
 							&best_move);
