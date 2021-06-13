@@ -1,5 +1,9 @@
 #include "eval.h"
 
+static const int piece_values[] = {
+	[PAWN] = 1, [KNIGHT] = 3, [BISHOP] = 3, [ROOK] = 5, [QUEEN] = 9,
+};
+
 int eval_position(const Position *position)
 {
 	int eval = 0;
@@ -12,9 +16,9 @@ int eval_position(const Position *position)
 			}
 
 			if (PIECE_COLOR(piece) == WHITE) {
-				eval++;
+				eval += piece_values[PIECE_TYPE(piece)];
 			} else {
-				eval--;
+				eval -= piece_values[PIECE_TYPE(piece)];
 			}
 		}
 	}
