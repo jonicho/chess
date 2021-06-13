@@ -64,7 +64,7 @@ char *piece_code_to_string(uint8_t pieceCode)
 	}
 }
 
-void position_print(const Position *position)
+void position_print_board(const Position *position)
 {
 	for (int rank = 7; rank >= 0; rank--) {
 		putchar('1' + rank);
@@ -84,7 +84,7 @@ void position_print(const Position *position)
 	putchar('\n');
 }
 
-void position_print_debug(const Position *position)
+void position_print_board_debug(const Position *position)
 {
 	for (int rank = 11; rank >= 0; rank--) {
 		if (rank >= 2 && rank <= 9) {

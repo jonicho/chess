@@ -67,11 +67,11 @@ extern const int8_t KING_MOVES[8];
 // Initializes a position.
 void position_init(Position *position);
 
-// Prints a position.
-void position_print(const Position *position);
+// Prints the board of a position.
+void position_print_board(const Position *position);
 
-// Prints a position including the off-board-squares for debugging.
-void position_print_debug(const Position *position);
+// Prints the board of a position including the off-board-squares for debugging.
+void position_print_board_debug(const Position *position);
 
 bool is_square_threatened(const Position *position, uint8_t threatened_side,
 			  uint8_t threatened_square);

@@ -18,7 +18,7 @@ void play_game()
 		if (was_move_invalid) {
 			printf("Invalid move, try again: ");
 		} else {
-			position_print(game.current_position);
+			position_print_board(game.current_position);
 			printf("\nIt's %s's turn. Make a move: ",
 			       game.current_position->side_to_move == WHITE ?
 					     "white" :
