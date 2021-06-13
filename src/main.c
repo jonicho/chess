@@ -3,6 +3,7 @@
 #include "perft.h"
 #include "test.h"
 #include "game.h"
+#include "search.h"
 
 #include <stdlib.h>
 #include <stddef.h>
@@ -15,6 +16,15 @@ void play_game()
 	game_init(&game);
 	bool was_move_invalid = false;
 	while (true) {
+		if (game.current_position->side_to_move == BLACK) {
+			Move best_move;
+			int eval = search_for_best_move(game.current_position,
+							&best_move);
+			printf("Computer played %s which has an evaluation of %d\n",
+			       move_to_string(best_move), eval);
+			game_make_move(&game, best_move);
+			continue;
+		}
 		if (was_move_invalid) {
 			printf("Invalid move, try again: ");
 		} else {
