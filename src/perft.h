@@ -6,6 +6,6 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-size_t perft(const Position *position, size_t depth, bool print);
+size_t perft(Position *position, size_t depth, bool print);
 
 #endif

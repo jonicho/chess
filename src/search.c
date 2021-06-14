@@ -5,7 +5,7 @@
 
 #include <limits.h>
 
-static int search_for_best_move_depth(const Position *position, Move *best_move,
+static int search_for_best_move_depth(Position *position, Move *best_move,
 				      size_t depth)
 {
 	Move moves[MAX_NUM_PSEUDO_LEGAL_MOVES];
@@ -14,20 +14,22 @@ static int search_for_best_move_depth(const Position *position, Move *best_move,
 	int best_move_eval =
 		position->side_to_move == WHITE ? INT_MIN : INT_MAX;
 	for (size_t i = 0; i < num_moves; i++) {
-		Position temp_position = *position;
-		make_move(&temp_position, moves[i]);
-		if (is_king_in_check(&temp_position,
-				     BLACK ^ temp_position.side_to_move)) {
+		UnmakeInfo unmake_info;
+		make_move_unmake(position, moves[i], &unmake_info);
+		if (is_king_in_check(position,
+				     BLACK ^ position->side_to_move)) {
+			unmake_move(position, moves[i], unmake_info);
 			continue;
 		}
 		int eval;
 		if (depth > 1) {
 			Move dummy_move;
-			eval = search_for_best_move_depth(
-				&temp_position, &dummy_move, depth - 1);
+			eval = search_for_best_move_depth(position, &dummy_move,
+							  depth - 1);
 		} else {
-			eval = eval_position(&temp_position);
+			eval = eval_position(position);
 		}
+		unmake_move(position, moves[i], unmake_info);
 		if ((position->side_to_move == WHITE &&
 		     eval > best_move_eval) ||
 		    (position->side_to_move == BLACK &&
@@ -40,7 +42,7 @@ static int search_for_best_move_depth(const Position *position, Move *best_move,
 	return best_move_eval;
 }
 
-int search_for_best_move(const Position *position, Move *best_move)
+int search_for_best_move(Position *position, Move *best_move)
 {
 	return search_for_best_move_depth(position, best_move, 5);
 }

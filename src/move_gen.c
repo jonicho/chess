@@ -268,17 +268,19 @@ size_t gen_moves(Move *moves, const Position *position)
 	return moves - initial_moves;
 }
 
-size_t gen_legal_moves(Move *moves, const Position *position)
+size_t gen_legal_moves(Move *moves, Position *position)
 {
 	size_t num_moves = gen_moves(moves, position);
 	size_t num_legal_moves = 0;
 	for (size_t i = 0; i < num_moves; i++) {
-		Position temp_position = *position;
-		make_move(&temp_position, moves[i]);
-		if (is_king_in_check(&temp_position,
-				     BLACK ^ temp_position.side_to_move)) {
+		UnmakeInfo unmake_info;
+		make_move_unmake(position, moves[i], &unmake_info);
+		if (is_king_in_check(position,
+				     BLACK ^ position->side_to_move)) {
+			unmake_move(position, moves[i], unmake_info);
 			continue;
 		}
+		unmake_move(position, moves[i], unmake_info);
 		moves[num_legal_moves++] = moves[i];
 	}
 	return num_legal_moves;

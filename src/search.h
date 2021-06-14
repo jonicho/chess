@@ -7,6 +7,6 @@
 #include <stddef.h>
 
 // Searches for the best move in a position and returns its evaluation.
-int search_for_best_move(const Position *position, Move *best_move);
+int search_for_best_move(Position *position, Move *best_move);
 
 #endif
