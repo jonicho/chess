@@ -70,9 +70,18 @@ void position_print_board(const Position *position)
 		putchar('1' + rank);
 		for (int file = 0; file < 8; file++) {
 			putchar(' ');
-			fputs(piece_code_to_string(
-				      position->squares[RF(rank, file)]),
-			      stdout);
+			uint8_t piece = position->squares[RF(rank, file)];
+			char *string;
+			if (PIECE_TYPE(piece) != EMPTY) {
+				string = piece_code_to_string(piece);
+			} else {
+				if ((rank + file) % 2 == 0) {
+					string = "\u2022";
+				} else {
+					string = "\u25e6";
+				}
+			}
+			fputs(string, stdout);
 		}
 		putchar('\n');
 	}
