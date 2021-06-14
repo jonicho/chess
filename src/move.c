@@ -4,8 +4,24 @@
 
 void make_move(Position *position, Move move)
 {
+	UnmakeInfo dummy_unmake_info;
+	make_move_unmake(position, move, &dummy_unmake_info);
+}
+
+void make_move_unmake(Position *position, Move move, UnmakeInfo *unmake_info)
+{
 	uint8_t moving_piece = position->squares[move.src];
 	uint8_t captured_piece = position->squares[move.dst];
+
+	// populate unmake info
+	unmake_info->captured_piece = captured_piece;
+	unmake_info->promotion = false;
+	unmake_info->prev_castling_ability = position->castling_ability;
+	unmake_info->prev_en_passant_target_square =
+		position->en_passant_target_square;
+	unmake_info->prev_halfmove_clock = position->halfmove_clock;
+	unmake_info->castling_rook_src_square = 0;
+	unmake_info->castling_rook_dst_square = 0;
 
 	// make move
 	position->squares[move.dst] = moving_piece;
@@ -23,6 +39,7 @@ void make_move(Position *position, Move move)
 	    (SQUARE_TO_RANK(move.dst) == 0 || SQUARE_TO_RANK(move.dst) == 7)) {
 		position->squares[move.dst] =
 			move.promotion_piece | PIECE_COLOR(moving_piece);
+		unmake_info->promotion = true;
 	}
 
 	// castling
@@ -34,6 +51,8 @@ void make_move(Position *position, Move move)
 		position->squares[rook_dst_square] =
 			position->squares[rook_src_square];
 		position->squares[rook_src_square] = EMPTY;
+		unmake_info->castling_rook_src_square = rook_src_square;
+		unmake_info->castling_rook_dst_square = rook_dst_square;
 	}
 
 	// remove castling ability
@@ -112,6 +131,56 @@ void make_move(Position *position, Move move)
 	if (position->side_to_move == WHITE) {
 		// increment if black just made a move
 		position->fullmove_counter++;
+	}
+}
+
+void unmake_move(Position *position, Move move, UnmakeInfo unmake_info)
+{
+	uint8_t moving_piece = position->squares[move.dst];
+	uint8_t captured_piece = unmake_info.captured_piece;
+
+	// unmake move
+	position->squares[move.src] = moving_piece;
+	position->squares[move.dst] = captured_piece;
+
+	// en passant
+	if (PIECE_TYPE(moving_piece) == PAWN &&
+	    move.dst == unmake_info.prev_en_passant_target_square) {
+		// put the pawn back
+		position->squares[RF(SQUARE_TO_RANK(move.src),
+				     SQUARE_TO_FILE(move.dst))] =
+			PAWN | (BLACK ^ PIECE_COLOR(moving_piece));
+	}
+
+	// promotion
+	if (unmake_info.promotion) {
+		position->squares[move.src] = PAWN | PIECE_COLOR(moving_piece);
+	}
+
+	// castling
+	if (unmake_info.castling_rook_src_square != 0) {
+		position->squares[unmake_info.castling_rook_src_square] =
+			position->squares[unmake_info.castling_rook_dst_square];
+		position->squares[unmake_info.castling_rook_dst_square] = EMPTY;
+	}
+
+	// castling ability
+	position->castling_ability = unmake_info.prev_castling_ability;
+
+	// flip side to move
+	position->side_to_move ^= BLACK;
+
+	// en passant target square
+	position->en_passant_target_square =
+		unmake_info.prev_en_passant_target_square;
+
+	// halfmove clock
+	position->halfmove_clock = unmake_info.prev_halfmove_clock;
+
+	// fullmove counter
+	if (position->side_to_move == BLACK) {
+		// decrement if black made the move
+		position->fullmove_counter--;
 	}
 }
 

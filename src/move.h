@@ -12,7 +12,21 @@ typedef struct Move {
 	uint8_t src, dst, promotion_piece;
 } Move;
 
+typedef struct UnmakeInfo {
+	uint8_t captured_piece;
+	bool promotion;
+	uint8_t prev_castling_ability;
+	uint8_t prev_en_passant_target_square;
+	uint8_t prev_halfmove_clock;
+	uint8_t castling_rook_src_square;
+	uint8_t castling_rook_dst_square;
+} UnmakeInfo;
+
 void make_move(Position *position, Move move);
+
+void make_move_unmake(Position *position, Move move, UnmakeInfo *unmake_info);
+
+void unmake_move(Position *position, Move move, UnmakeInfo unmake_info);
 
 // Converts a move to a string using pure coordinate notation.
 char *move_to_string(Move move);
