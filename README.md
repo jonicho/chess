@@ -40,11 +40,11 @@ $ make clean
 ### Usage
 To play a game against the computer, simply run:
 ```
-$ ./build/chess test
+$ ./build/chess
 ```
 or 
 ```
-$ ./build_release/chess test
+$ ./build_release/chess
 ```
 depending on whether you compiled for release or development.
 
