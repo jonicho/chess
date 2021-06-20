@@ -32,16 +32,7 @@ bool game_make_move(Game *game, Move move)
 		return false;
 	}
 
-	Position temp_position = *game->current_position;
-
-	make_move(&temp_position, move);
-
-	if (is_king_in_check(&temp_position,
-			     BLACK ^ temp_position.side_to_move)) {
-		return false;
-	}
-
-	*game->current_position = temp_position;
+	make_move(game->current_position, move);
 
 	while (game->num_moves >= game->moves_capacity) {
 		game->moves_capacity *= 2;
