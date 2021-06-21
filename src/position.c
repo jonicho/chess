@@ -93,33 +93,6 @@ void position_print_board(const Position *position)
 	putchar('\n');
 }
 
-void position_print_board_debug(const Position *position)
-{
-	for (int rank = 11; rank >= 0; rank--) {
-		if (rank >= 2 && rank <= 9) {
-			putchar('1' + rank - 2);
-		} else {
-			putchar(' ');
-		}
-
-		for (int file = 0; file < 10; file++) {
-			putchar(' ');
-			fputs(piece_code_to_string(
-				      position->squares[rank * 10 + file]),
-			      stdout);
-		}
-		putchar('\n');
-	}
-	putchar(' ');
-	putchar(' ');
-	putchar(' ');
-	for (int file = 0; file < 8; file++) {
-		putchar(' ');
-		putchar('a' + file);
-	}
-	putchar('\n');
-}
-
 bool is_square_threatened(const Position *position, uint8_t threatened_side,
 			  uint8_t threatened_square)
 {
