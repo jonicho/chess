@@ -5,8 +5,8 @@
 
 #include <limits.h>
 
-static int search_for_best_move_depth(const Position *position, Move *best_move,
-				      size_t depth)
+static int minimax_alpha_beta(const Position *position, Move *best_move,
+			      size_t depth, int alpha, int beta)
 {
 	Move moves[MAX_NUM_PSEUDO_LEGAL_MOVES];
 	size_t num_moves = gen_moves(moves, position);
@@ -23,17 +23,33 @@ static int search_for_best_move_depth(const Position *position, Move *best_move,
 		int eval;
 		if (depth > 1) {
 			Move dummy_move;
-			eval = search_for_best_move_depth(
-				&temp_position, &dummy_move, depth - 1);
+			if (position->side_to_move == WHITE) {
+				eval = minimax_alpha_beta(&temp_position,
+							  &dummy_move,
+							  depth - 1,
+							  best_move_eval, beta);
+			} else {
+				eval = minimax_alpha_beta(&temp_position,
+							  &dummy_move,
+							  depth - 1, alpha,
+							  best_move_eval);
+			}
 		} else {
 			eval = eval_position(&temp_position);
 		}
+
 		if ((position->side_to_move == WHITE &&
 		     eval > best_move_eval) ||
 		    (position->side_to_move == BLACK &&
 		     eval < best_move_eval)) {
 			best_move_eval = eval;
 			best_move_index = i;
+		}
+		if ((position->side_to_move == WHITE &&
+		     best_move_eval >= beta) ||
+		    (position->side_to_move == BLACK &&
+		     best_move_eval <= alpha)) {
+			break;
 		}
 	}
 	*best_move = moves[best_move_index];
@@ -42,5 +58,5 @@ static int search_for_best_move_depth(const Position *position, Move *best_move,
 
 int search_for_best_move(const Position *position, Move *best_move)
 {
-	return search_for_best_move_depth(position, best_move, 5);
+	return minimax_alpha_beta(position, best_move, 8, INT_MIN, INT_MAX);
 }
