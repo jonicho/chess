@@ -1,7 +1,9 @@
 #include "eval.h"
 
+// piece values from https://www.chessprogramming.org/Simplified_Evaluation_Function
 static const int piece_values[] = {
-	[PAWN] = 1, [KNIGHT] = 3, [BISHOP] = 3, [ROOK] = 5, [QUEEN] = 9,
+	[PAWN] = 100, [KNIGHT] = 320, [BISHOP] = 330,
+	[ROOK] = 500, [QUEEN] = 900,  [KING] = 20000,
 };
 
 int eval_position(const Position *position)
