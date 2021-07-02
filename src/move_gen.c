@@ -226,40 +226,55 @@ void gen_castling_moves(Move **moves, const Position *position)
 	}
 }
 
+static void gen_moves_square(Move **moves, const Position *position,
+			     uint8_t square)
+{
+	uint8_t piece = position->squares[square];
+	if (PIECE_COLOR(piece) != position->side_to_move) {
+		return;
+	}
+	switch (PIECE_TYPE(piece)) {
+	case EMPTY:
+		return;
+	case PAWN:
+		gen_pawn_moves(moves, position, square);
+		break;
+	case KNIGHT:
+		gen_knight_moves(moves, position, square);
+		break;
+	case BISHOP:
+		gen_bishop_moves(moves, position, square);
+		break;
+	case ROOK:
+		gen_rook_moves(moves, position, square);
+		break;
+	case QUEEN:
+		gen_queen_moves(moves, position, square);
+		break;
+	case KING:
+		gen_king_moves(moves, position, square);
+		break;
+
+	default:
+		break;
+	}
+}
+
 size_t gen_moves(Move *moves, const Position *position)
 {
 	Move *initial_moves = moves;
-	for (int rank = 7; rank >= 0; rank--) {
-		for (int file = 0; file < 8; file++) {
-			uint8_t square = RF(rank, file);
-			uint8_t piece = position->squares[square];
-			if (PIECE_COLOR(piece) != position->side_to_move) {
-				continue;
+	if (position->side_to_move == WHITE) {
+		for (int rank = 7; rank >= 0; rank--) {
+			for (int file = 0; file < 8; file++) {
+				gen_moves_square(&moves, position,
+						 RF(rank, file));
 			}
-			switch (PIECE_TYPE(piece)) {
-			case EMPTY:
-				continue;
-			case PAWN:
-				gen_pawn_moves(&moves, position, square);
-				break;
-			case KNIGHT:
-				gen_knight_moves(&moves, position, square);
-				break;
-			case BISHOP:
-				gen_bishop_moves(&moves, position, square);
-				break;
-			case ROOK:
-				gen_rook_moves(&moves, position, square);
-				break;
-			case QUEEN:
-				gen_queen_moves(&moves, position, square);
-				break;
-			case KING:
-				gen_king_moves(&moves, position, square);
-				break;
-
-			default:
-				break;
+		}
+	} else {
+		for (int rank = 0; rank < 8; rank++) {
+			for (int file = 0; file < 8; file++) {
+				gen_moves_square(&moves, position,
+						 RF(rank, file));
 			}
 		}
 	}
