@@ -23,7 +23,10 @@ void play_game()
 							&best_move);
 			printf("Computer played %s which has an evaluation of %d\n",
 			       move_to_string(best_move), eval);
-			game_make_move(&game, best_move);
+			if (!game_make_move(&game, best_move)) {
+				printf("error: Computer made an illegal move!\n");
+				exit(-1);
+			}
 			continue;
 		}
 		if (was_move_invalid) {
