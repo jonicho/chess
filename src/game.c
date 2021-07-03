@@ -16,7 +16,7 @@ void game_init(Game *game)
 
 bool game_make_move(Game *game, Move move)
 {
-	Move moves[MAX_NUM_PSEUDO_LEGAL_MOVES];
+	Move moves[MAX_MOVES];
 	size_t num_moves = gen_legal_moves(moves, game->current_position);
 	bool is_move_legal = false;
 
