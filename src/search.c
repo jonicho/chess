@@ -54,9 +54,9 @@ static int minimax_alpha_beta(const Position *position, Move *best_move,
 				continue;
 			}
 			Move dummy_move;
-			int eval = minimax_alpha_beta(&temp_position,
-						      &dummy_move, depth - 1,
-						      best_move_eval, beta);
+			int eval =
+				minimax_alpha_beta(&temp_position, &dummy_move,
+						   depth - 1, alpha, beta);
 
 			if (eval > best_move_eval) {
 				best_move_eval = eval;
@@ -80,9 +80,9 @@ static int minimax_alpha_beta(const Position *position, Move *best_move,
 				continue;
 			}
 			Move dummy_move;
-			int eval = minimax_alpha_beta(&temp_position,
-						      &dummy_move, depth - 1,
-						      alpha, best_move_eval);
+			int eval =
+				minimax_alpha_beta(&temp_position, &dummy_move,
+						   depth - 1, alpha, beta);
 
 			if (eval < best_move_eval) {
 				best_move_eval = eval;
