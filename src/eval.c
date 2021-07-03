@@ -21,7 +21,7 @@ int eval_position(const Position *position)
 			}
 		}
 	}
-	return eval;
+	return position->side_to_move == WHITE ? eval : -eval;
 }
 
 int eval_move(const Position *position, const Move *move)

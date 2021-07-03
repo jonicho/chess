@@ -4,8 +4,7 @@
 #include "position.h"
 #include "move.h"
 
-// Evaluates a position.
-// A positive number is good for white, a negative number is good for black.
+// Evaluates a position in the point of view of the current side to move.
 int eval_position(const Position *position);
 
 // Evaluates a move.
