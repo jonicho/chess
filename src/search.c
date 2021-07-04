@@ -2,18 +2,29 @@
 
 #include "move_gen.h"
 #include "eval.h"
+#include "table.h"
 
 #include <limits.h>
+
+#define SEARCH_DEPTH 9
 
 static void sort_moves(const Position *position, Move *moves, size_t num_moves)
 {
 	if (num_moves <= 1) {
 		return;
 	}
+	const Move *best_move = table_get_best_move(position->hash);
 
 	int evals[MAX_MOVES];
 	for (size_t i = 0; i < num_moves; i++) {
-		evals[i] = eval_move(position, moves + i);
+		if (best_move != NULL && (moves + i)->src == best_move->src &&
+		    (moves + i)->dst == best_move->dst &&
+		    (moves + i)->promotion_piece ==
+			    best_move->promotion_piece) {
+			evals[i] = INT_MAX;
+		} else {
+			evals[i] = eval_move(position, moves + i);
+		}
 	}
 
 	// insertion sort
@@ -66,10 +77,16 @@ static int negamax_alpha_beta(const Position *position, Move *best_move,
 		}
 	}
 	*best_move = moves[best_move_index];
+	table_put(position->hash, *best_move);
 	return best_move_eval;
 }
 
 int search_for_best_move(const Position *position, Move *best_move)
 {
-	return negamax_alpha_beta(position, best_move, 8, -INT_MAX, INT_MAX);
+	table_clear();
+	for (size_t i = 0; i < SEARCH_DEPTH - 1; i++) {
+		negamax_alpha_beta(position, best_move, i, -INT_MAX, INT_MAX);
+	}
+	return negamax_alpha_beta(position, best_move, SEARCH_DEPTH, -INT_MAX,
+				  INT_MAX);
 }

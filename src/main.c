@@ -4,14 +4,20 @@
 #include "test.h"
 #include "game.h"
 #include "search.h"
+#include "zobrist.h"
+#include "table.h"
 
 #include <stdlib.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 void play_game()
 {
+	zobrist_init(time(NULL));
+	table_init();
+
 	Game game;
 	game_init(&game);
 	bool was_move_invalid = false;

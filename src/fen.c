@@ -1,5 +1,7 @@
 #include "fen.h"
 
+#include "zobrist.h"
+
 #include <stdlib.h>
 
 uint8_t char_to_piece_code(char c)
@@ -156,6 +158,8 @@ Position *fen_to_position(const char *fen)
 			return NULL;
 		}
 	}
+
+	position->hash = zobrist_generate_hash(position);
 
 	return position;
 }
