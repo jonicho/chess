@@ -8,14 +8,18 @@
 
 void game_init(Game *game)
 {
+	*game = (Game){ 0 };
 	game->current_position = fen_to_position(FEN_STARTING_POSITION);
 	game->moves_capacity = INITIAL_MOVES_CAPACITY;
-	game->num_moves = 0;
 	game->moves = malloc(sizeof(Move) * game->moves_capacity);
 }
 
 bool game_make_move(Game *game, Move move)
 {
+	if (game->outcome != OUTCOME_NONE) {
+		return false;
+	}
+
 	Move moves[MAX_MOVES];
 	size_t num_moves = gen_legal_moves(moves, game->current_position);
 	bool is_move_legal = false;
@@ -40,6 +44,21 @@ bool game_make_move(Game *game, Move move)
 				      sizeof(Move) * game->moves_capacity);
 	}
 	game->moves[game->num_moves++] = move;
+
+	Move tmp_moves[MAX_MOVES];
+	bool has_game_ended =
+		gen_legal_moves(tmp_moves, game->current_position) == 0;
+	if (has_game_ended) {
+		if (is_king_in_check(game->current_position,
+				     game->current_position->side_to_move)) {
+			game->outcome =
+				game->current_position->side_to_move == WHITE ?
+					      OUTCOME_BLACK_WON :
+					      OUTCOME_WHITE_WON;
+		} else {
+			game->outcome = OUTCOME_DRAW;
+		}
+	}
 
 	return true;
 }

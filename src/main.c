@@ -22,10 +22,29 @@ void play_game()
 
 	Game game;
 	game_init(&game);
-	bool was_move_invalid = false;
 	while (true) {
-		if (game.current_position->side_to_move == BLACK) {
-			position_print_board(game.current_position);
+		position_print_board(game.current_position);
+
+		if (game.outcome != OUTCOME_NONE) {
+			printf("The game ended: ");
+			switch (game.outcome) {
+			case OUTCOME_NONE:
+				printf("ERROR: unreachable\n");
+				exit(-1);
+			case OUTCOME_WHITE_WON:
+				printf("White won!\n");
+				break;
+			case OUTCOME_BLACK_WON:
+				printf("Black won!\n");
+				break;
+			case OUTCOME_DRAW:
+				printf("Draw!\n");
+				break;
+			}
+			return;
+		}
+
+		if (game.current_position->side_to_move == WHITE) {
 			printf("\nIt's %s's turn. Searching for %d seconds...\n",
 			       game.current_position->side_to_move == WHITE ?
 					     "white" :
@@ -35,9 +54,8 @@ void play_game()
 			do_search(game.current_position, SEARCH_SECONDS,
 				  &search_result);
 			printf("Search completed: depth: %ld, nodes searched: %ld, nps: %ld, best move: %s, best move eval: %d\n",
-			       search_result.depth,
-				   search_result.nodes,
-				   search_result.nodes / SEARCH_SECONDS,
+			       search_result.depth, search_result.nodes,
+			       search_result.nodes / SEARCH_SECONDS,
 			       move_to_string(search_result.best_move),
 			       search_result.best_move_eval);
 			if (!game_make_move(&game, search_result.best_move)) {
@@ -46,28 +64,28 @@ void play_game()
 			}
 			continue;
 		}
-		if (was_move_invalid) {
-			printf("Invalid move, try again: ");
-		} else {
-			position_print_board(game.current_position);
-			printf("\nIt's %s's turn. Make a move: ",
-			       game.current_position->side_to_move == WHITE ?
-					     "white" :
-					     "black");
-		}
+		printf("\nIt's %s's turn. Make a move: ",
+		       game.current_position->side_to_move == WHITE ? "white" :
+									    "black");
 
-		size_t n = 0;
-		char *line = NULL;
-		ssize_t nread = getline(&line, &n, stdin);
+		bool invalid_move;
+		do {
+			invalid_move = false;
+			size_t n = 0;
+			char *line = NULL;
+			ssize_t nread = getline(&line, &n, stdin);
 
-		if (nread == -1) {
-			printf("There was an error reading the input.\n");
-			return;
-		}
-		line[--nread] = '\0'; // remove trailing newline
-		Move *move = move_from_string(line);
-		was_move_invalid =
-			move == NULL || !game_make_move(&game, *move);
+			if (nread == -1) {
+				printf("There was an error reading the input.\n");
+				return;
+			}
+			line[--nread] = '\0'; // remove trailing newline
+			Move *move = move_from_string(line);
+			if (move == NULL || !game_make_move(&game, *move)) {
+				invalid_move = true;
+				printf("Invalid move, try again: ");
+			}
+		} while (invalid_move);
 	}
 }
 

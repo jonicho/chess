@@ -9,8 +9,16 @@
 
 #define INITIAL_MOVES_CAPACITY 128
 
+typedef enum Outcome {
+	OUTCOME_NONE = 0,
+	OUTCOME_WHITE_WON,
+	OUTCOME_BLACK_WON,
+	OUTCOME_DRAW
+} Outcome;
+
 typedef struct Game {
 	Position *current_position;
+	Outcome outcome;
 	Move *moves;
 	size_t moves_capacity;
 	size_t num_moves;
