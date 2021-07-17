@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
 
 static void sort_moves(const Position *position, Move *moves, size_t num_moves)
 {
@@ -137,18 +138,21 @@ void do_search(const Position *position, unsigned int seconds,
 	pthread_t thread;
 	int err = pthread_create(&thread, NULL, search_thread, &info);
 	if (err != 0) {
-		perror("could not create search thread");
+		fprintf(stderr, "error: could not create search thread: %s\n",
+			strerror(err));
 		exit(-1);
 	}
 	sleep(seconds);
 	err = pthread_cancel(thread);
 	if (err != 0) {
-		perror("could not cancel search thread");
+		fprintf(stderr, "error: could not cancel search thread: %s\n",
+			strerror(err));
 		exit(-1);
 	}
 	err = pthread_join(thread, NULL);
 	if (err != 0) {
-		perror("could not join search thread");
+		fprintf(stderr, "error: could not join search thread: %s\n",
+			strerror(err));
 		exit(-1);
 	}
 }

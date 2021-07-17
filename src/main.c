@@ -29,7 +29,7 @@ void play_game()
 			printf("The game ended: ");
 			switch (game.outcome) {
 			case OUTCOME_NONE:
-				printf("ERROR: unreachable\n");
+				fprintf(stderr, "error: unreachable\n");
 				exit(-1);
 			case OUTCOME_WHITE_WON:
 				printf("White won!\n");
@@ -84,7 +84,8 @@ void play_game()
 			}
 
 			if (!game_make_move(&game, search_result.best_move)) {
-				printf("error: Computer made an illegal move!\n");
+				fprintf(stderr,
+					"error: computer made an illegal move\n");
 				exit(-1);
 			}
 			continue;
@@ -101,8 +102,8 @@ void play_game()
 			ssize_t nread = getline(&line, &n, stdin);
 
 			if (nread == -1) {
-				printf("There was an error reading the input.\n");
-				return;
+				perror("error: could not read line");
+				exit(-1);
 			}
 			line[--nread] = '\0'; // remove trailing newline
 			Move *move = move_from_string(line);

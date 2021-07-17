@@ -59,7 +59,7 @@ char *piece_code_to_string(uint8_t pieceCode)
 		return "O";
 
 	default:
-		fprintf(stderr, "unknown piece-code: %d\n", pieceCode);
+		fprintf(stderr, "error: unknown piece-code: %d\n", pieceCode);
 		exit(-1);
 	}
 }
