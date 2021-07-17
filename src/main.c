@@ -13,6 +13,8 @@
 #include <string.h>
 #include <time.h>
 
+#define SEARCH_SECONDS 10
+
 void play_game()
 {
 	zobrist_init(time(NULL));
@@ -24,12 +26,21 @@ void play_game()
 	while (true) {
 		if (game.current_position->side_to_move == BLACK) {
 			position_print_board(game.current_position);
-			Move best_move;
-			int eval = search_for_best_move(game.current_position,
-							&best_move);
-			printf("Computer played %s which has an evaluation of %d\n",
-			       move_to_string(best_move), eval);
-			if (!game_make_move(&game, best_move)) {
+			printf("\nIt's %s's turn. Searching for %d seconds...\n",
+			       game.current_position->side_to_move == WHITE ?
+					     "white" :
+					     "black",
+			       SEARCH_SECONDS);
+			SearchResult search_result;
+			do_search(game.current_position, SEARCH_SECONDS,
+				  &search_result);
+			printf("Search completed: depth: %ld, nodes searched: %ld, nps: %ld, best move: %s, best move eval: %d\n",
+			       search_result.depth,
+				   search_result.nodes,
+				   search_result.nodes / SEARCH_SECONDS,
+			       move_to_string(search_result.best_move),
+			       search_result.best_move_eval);
+			if (!game_make_move(&game, search_result.best_move)) {
 				printf("error: Computer made an illegal move!\n");
 				exit(-1);
 			}

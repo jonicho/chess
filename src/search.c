@@ -5,8 +5,10 @@
 #include "table.h"
 
 #include <limits.h>
-
-#define SEARCH_DEPTH 9
+#include <pthread.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
 
 static void sort_moves(const Position *position, Move *moves, size_t num_moves)
 {
@@ -43,8 +45,9 @@ static void sort_moves(const Position *position, Move *moves, size_t num_moves)
 }
 
 static int negamax_alpha_beta(const Position *position, Move *best_move,
-			      size_t depth, int alpha, int beta)
+			      size_t depth, int alpha, int beta, size_t *nodes)
 {
+	(*nodes)++;
 	if (depth == 0) {
 		return eval_position(position);
 	}
@@ -63,7 +66,7 @@ static int negamax_alpha_beta(const Position *position, Move *best_move,
 		}
 		Move dummy_move;
 		int eval = -negamax_alpha_beta(&temp_position, &dummy_move,
-					       depth - 1, -beta, -alpha);
+					       depth - 1, -beta, -alpha, nodes);
 
 		if (eval > best_move_eval) {
 			best_move_eval = eval;
@@ -77,16 +80,69 @@ static int negamax_alpha_beta(const Position *position, Move *best_move,
 		}
 	}
 	*best_move = moves[best_move_index];
+
+	// temporarily disable cancellation while writing to the transposition table
+	pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
 	table_put(position->hash, *best_move);
+	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 	return best_move_eval;
 }
 
-int search_for_best_move(const Position *position, Move *best_move)
+typedef struct SearchInfo {
+	const Position *position;
+	SearchResult *result;
+} SearchInfo;
+
+static void *search_thread(void *arg)
+{
+	SearchInfo *info = (SearchInfo *)arg;
+	// enable cancellation at any time
+	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+
+	size_t depth = 1;
+	while (true) {
+		Move best_move;
+		int best_move_eval = negamax_alpha_beta(
+			info->position, &best_move, depth, -INT_MAX, INT_MAX, &info->result->nodes);
+
+		// temporarily disable cancellation while writing the result
+		pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
+		info->result->best_move = best_move;
+		info->result->best_move_eval = best_move_eval;
+		info->result->depth = depth;
+		pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+		depth++;
+	}
+	return NULL;
+}
+
+void do_search(const Position *position, unsigned int seconds,
+	       SearchResult *result)
 {
 	table_clear();
-	for (size_t i = 0; i < SEARCH_DEPTH - 1; i++) {
-		negamax_alpha_beta(position, best_move, i, -INT_MAX, INT_MAX);
+	result->nodes = 0;
+	SearchInfo info = { .position = position, .result = result };
+	pthread_t thread;
+	int err = pthread_create(&thread, NULL, search_thread, &info);
+	if (err != 0) {
+		perror("could not create search thread");
+		exit(-1);
 	}
-	return negamax_alpha_beta(position, best_move, SEARCH_DEPTH, -INT_MAX,
-				  INT_MAX);
+	sleep(seconds);
+	err = pthread_cancel(thread);
+	if (err != 0) {
+		perror("could not cancel search thread");
+		exit(-1);
+	}
+	void *thread_return;
+	err = pthread_join(thread, &thread_return);
+	if (err != 0) {
+		perror("could not join search thread");
+		exit(-1);
+	}
+	if (thread_return != PTHREAD_CANCELED) {
+		fprintf(stderr, "error: search thread was not cancelled\n");
+		exit(-1);
+	}
 }

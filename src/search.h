@@ -6,7 +6,15 @@
 
 #include <stddef.h>
 
-// Searches for the best move in a position and returns its evaluation.
-int search_for_best_move(const Position *position, Move *best_move);
+typedef struct SearchResult {
+	Move best_move;
+	int best_move_eval;
+	size_t depth;
+	size_t nodes;
+} SearchResult;
+
+// Searches for the best move in a position for the specified amount of seconds.
+void do_search(const Position *position, unsigned int seconds,
+	       SearchResult *result);
 
 #endif

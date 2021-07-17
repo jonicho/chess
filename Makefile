@@ -22,6 +22,8 @@ CC = gcc
 CPPFLAGS = $(INC_FLAGS) -MMD -MP
 CFLAGS = -Wall -Wextra -pedantic -Werror
 
+LDFLAGS = -pthread
+
 ifeq ($(MAKE_RELEASE), 0)
 	CFLAGS := $(CFLAGS) -g
 else
