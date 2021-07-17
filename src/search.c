@@ -57,6 +57,7 @@ static int negamax_alpha_beta(const Position *position, Move *best_move,
 	sort_moves(position, moves, num_moves);
 	size_t best_move_index = -1;
 	int best_move_eval = INT_MIN;
+	bool no_more_moves = true;
 	for (size_t i = 0; i < num_moves; i++) {
 		Position temp_position = *position;
 		make_move(&temp_position, moves[i]);
@@ -64,6 +65,7 @@ static int negamax_alpha_beta(const Position *position, Move *best_move,
 				     BLACK ^ temp_position.side_to_move)) {
 			continue;
 		}
+		no_more_moves = false;
 		Move dummy_move;
 		int eval = -negamax_alpha_beta(&temp_position, &dummy_move,
 					       depth - 1, -beta, -alpha, nodes);
@@ -77,6 +79,13 @@ static int negamax_alpha_beta(const Position *position, Move *best_move,
 		}
 		if (beta <= alpha) {
 			break;
+		}
+	}
+	if (no_more_moves) {
+		if (is_king_in_check(position, position->side_to_move)) {
+			return -CHECKMATE_EVAL - depth;
+		} else {
+			return eval_position(position);
 		}
 	}
 	*best_move = moves[best_move_index];
@@ -103,8 +112,10 @@ static void *search_thread(void *arg)
 	size_t depth = 1;
 	while (true) {
 		Move best_move;
-		int best_move_eval = negamax_alpha_beta(
-			info->position, &best_move, depth, -INT_MAX, INT_MAX, &info->result->nodes);
+		int best_move_eval =
+			negamax_alpha_beta(info->position, &best_move, depth,
+					   -INT_MAX, INT_MAX,
+					   &info->result->nodes);
 
 		// temporarily disable cancellation while writing the result
 		pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);

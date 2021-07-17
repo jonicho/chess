@@ -44,7 +44,7 @@ void play_game()
 			return;
 		}
 
-		if (game.current_position->side_to_move == WHITE) {
+		if (game.current_position->side_to_move == BLACK) {
 			printf("\nIt's %s's turn. Searching for %d seconds...\n",
 			       game.current_position->side_to_move == WHITE ?
 					     "white" :
@@ -53,11 +53,36 @@ void play_game()
 			SearchResult search_result;
 			do_search(game.current_position, SEARCH_SECONDS,
 				  &search_result);
-			printf("Search completed: depth: %ld, nodes searched: %ld, nps: %ld, best move: %s, best move eval: %d\n",
+			printf("Search completed: depth: %ld, nodes searched: %ld, nps: %ld, best move: %s, best move eval: %d",
 			       search_result.depth, search_result.nodes,
 			       search_result.nodes / SEARCH_SECONDS,
 			       move_to_string(search_result.best_move),
 			       search_result.best_move_eval);
+
+			if (search_result.best_move_eval >= CHECKMATE_EVAL) {
+				int moves_until_win =
+					(-search_result.best_move_eval +
+					 CHECKMATE_EVAL +
+					 (int)search_result.depth) /
+						2 +
+					1;
+				printf(" (winning in %d move%s)\n",
+				       moves_until_win,
+				       moves_until_win == 1 ? "" : "s");
+			} else if (search_result.best_move_eval <=
+				   -CHECKMATE_EVAL) {
+				int moves_until_lose =
+					(search_result.best_move_eval +
+					 CHECKMATE_EVAL +
+					 (int)search_result.depth) /
+					2;
+				printf(" (losing in %d move%s)\n",
+				       moves_until_lose,
+				       moves_until_lose == 1 ? "" : "s");
+			} else {
+				printf("\n");
+			}
+
 			if (!game_make_move(&game, search_result.best_move)) {
 				printf("error: Computer made an illegal move!\n");
 				exit(-1);

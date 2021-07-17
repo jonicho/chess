@@ -6,6 +6,8 @@
 
 #include <stddef.h>
 
+#define CHECKMATE_EVAL 1000000000
+
 typedef struct SearchResult {
 	Move best_move;
 	int best_move_eval;
