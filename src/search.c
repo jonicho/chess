@@ -146,14 +146,9 @@ void do_search(const Position *position, unsigned int seconds,
 		perror("could not cancel search thread");
 		exit(-1);
 	}
-	void *thread_return;
-	err = pthread_join(thread, &thread_return);
+	err = pthread_join(thread, NULL);
 	if (err != 0) {
 		perror("could not join search thread");
-		exit(-1);
-	}
-	if (thread_return != PTHREAD_CANCELED) {
-		fprintf(stderr, "error: search thread was not cancelled\n");
 		exit(-1);
 	}
 }
