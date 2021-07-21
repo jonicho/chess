@@ -11,6 +11,7 @@
 typedef struct Entry {
 	uint64_t hash;
 	Move best_move;
+	uint8_t depth;
 	struct Entry *next;
 } Entry;
 
@@ -21,7 +22,7 @@ typedef struct Table {
 
 void table_init();
 void table_clear();
-void table_put(uint64_t hash, Move best_move);
+void table_put(uint64_t hash, Move best_move, uint8_t depth);
 Move *table_get_best_move(uint64_t hash);
 
 void table_print_debug();

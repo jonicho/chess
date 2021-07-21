@@ -34,31 +34,42 @@ void table_clear()
 	table->num_entries = 0;
 }
 
-void table_put(uint64_t hash, Move best_move)
+void table_put(uint64_t hash, Move best_move, uint8_t depth)
 {
-	if (table->buckets[hash % TABLE_NUM_BUCKETS].hash == hash) {
-		table->buckets[hash % TABLE_NUM_BUCKETS].best_move = best_move;
+	Entry *bucket = &table->buckets[hash % TABLE_NUM_BUCKETS];
+	if (bucket->hash == hash) {
+		if (bucket->depth > depth) {
+			return;
+		}
+		bucket->best_move = best_move;
+		bucket->depth = depth;
 		return;
 	}
-	if (table->buckets[hash % TABLE_NUM_BUCKETS].hash == 0) {
+	if (bucket->hash == 0) {
 		table->num_entries++;
-		table->buckets[hash % TABLE_NUM_BUCKETS].hash = hash;
-		table->buckets[hash % TABLE_NUM_BUCKETS].best_move = best_move;
+		bucket->hash = hash;
+		bucket->best_move = best_move;
+		bucket->depth = depth;
 		return;
 	}
 
-	Entry **entry_ptr = &table->buckets[hash % TABLE_NUM_BUCKETS].next;
+	Entry **entry_ptr = &bucket->next;
 	while (*entry_ptr != NULL && (*entry_ptr)->hash != hash) {
 		entry_ptr = &(*entry_ptr)->next;
 	}
 	if ((*entry_ptr) != NULL) {
+		if ((*entry_ptr)->depth > depth) {
+			return;
+		}
 		(*entry_ptr)->best_move = best_move;
+		(*entry_ptr)->depth = depth;
 		return;
 	}
 
 	Entry *new_entry = malloc(sizeof(Entry));
 	new_entry->hash = hash;
 	new_entry->best_move = best_move;
+	new_entry->depth = depth;
 	new_entry->next = NULL;
 	*entry_ptr = new_entry;
 
@@ -67,14 +78,15 @@ void table_put(uint64_t hash, Move best_move)
 
 Move *table_get_best_move(uint64_t hash)
 {
-	if (table->buckets[hash % TABLE_NUM_BUCKETS].hash == hash) {
-		return &table->buckets[hash % TABLE_NUM_BUCKETS].best_move;
+	Entry *bucket = &table->buckets[hash % TABLE_NUM_BUCKETS];
+	if (bucket->hash == hash) {
+		return &bucket->best_move;
 	}
-	if (table->buckets[hash % TABLE_NUM_BUCKETS].hash == 0) {
+	if (bucket->hash == 0) {
 		return NULL;
 	}
 
-	Entry *entry = table->buckets[hash % TABLE_NUM_BUCKETS].next;
+	Entry *entry = bucket->next;
 	while (entry != NULL && entry->hash != hash) {
 		entry = entry->next;
 	}

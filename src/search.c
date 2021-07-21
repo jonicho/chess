@@ -98,7 +98,7 @@ static int negamax_alpha_beta(const Position *position, Move *best_move,
 		}
 	}
 	*best_move = moves[best_move_index];
-	table_put(position->hash, *best_move);
+	table_put(position->hash, *best_move, depth);
 	return best_move_eval;
 }
 
