@@ -145,6 +145,7 @@ static void command_go()
 
 void uci()
 {
+#ifdef DEBUG
 	debug_fd = fopen("/tmp/uci.log", "w");
 	if (debug_fd == NULL) {
 		perror("error: could not open log file");
@@ -153,6 +154,7 @@ void uci()
 	time_t t = time(NULL);
 	fprintf(debug_fd, "%s\n", asctime(localtime(&t)));
 	fflush(debug_fd);
+#endif
 	// wait for "uci" command
 	{
 		char *line = NULL;

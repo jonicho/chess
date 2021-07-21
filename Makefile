@@ -25,7 +25,7 @@ CFLAGS = -Wall -Wextra -pedantic -Werror
 LDFLAGS = -pthread
 
 ifeq ($(MAKE_RELEASE), 0)
-	CFLAGS := $(CFLAGS) -g
+	CFLAGS := $(CFLAGS) -g -DDEBUG
 else
 	CFLAGS := $(CFLAGS) -O3
 endif
