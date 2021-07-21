@@ -17,7 +17,6 @@
 #include <sys/time.h>
 
 #define SEARCH_SECONDS 10
-#define EVAL_STRING_LENGTH 256
 
 static void print_search_info(const Search *search)
 {
@@ -31,8 +30,8 @@ static void print_search_info(const Search *search)
 				(search->start_time.tv_sec * 1000 +
 				 search->start_time.tv_usec / 1000);
 	size_t nps = search->nodes / (elapsed_millis / 1000.0);
-	char eval_string[EVAL_STRING_LENGTH];
-	search_eval_to_string(search, eval_string, EVAL_STRING_LENGTH);
+	char eval_string[256];
+	search_eval_to_string(search, eval_string, sizeof(eval_string));
 	printf("search: depth: %2ld, time: %7ld, nodes: %12ld, nps: %8ld, best move eval: %6s, pv:",
 	       search->depth, elapsed_millis, search->nodes, nps, eval_string);
 
