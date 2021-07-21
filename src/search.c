@@ -6,13 +6,8 @@
 
 #include <limits.h>
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-
-static pthread_t search_thread;
-static bool is_search_thread_running = false;
-static bool stop = false;
 
 static void sort_moves(const Position *position, Move *moves, size_t num_moves)
 {
@@ -48,15 +43,16 @@ static void sort_moves(const Position *position, Move *moves, size_t num_moves)
 	}
 }
 
-static int negamax_alpha_beta(const Position *position, Move *best_move,
-			      size_t depth, int alpha, int beta, size_t *nodes)
+static int negamax_alpha_beta(Search *search, const Position *position,
+			      Move *best_move, size_t depth, int alpha,
+			      int beta)
 {
-	if (stop) {
+	if (search->stop_requested) {
 		pthread_exit(NULL);
 		fprintf(stderr, "thread did not exit\n");
 		exit(1);
 	}
-	(*nodes)++;
+	search->nodes++;
 	if (depth == 0) {
 		return eval_position(position);
 	}
@@ -76,8 +72,9 @@ static int negamax_alpha_beta(const Position *position, Move *best_move,
 		}
 		no_more_moves = false;
 		Move dummy_move;
-		int eval = -negamax_alpha_beta(&temp_position, &dummy_move,
-					       depth - 1, -beta, -alpha, nodes);
+		int eval =
+			-negamax_alpha_beta(search, &temp_position, &dummy_move,
+					    depth - 1, -beta, -alpha);
 
 		if (eval > best_move_eval) {
 			best_move_eval = eval;
@@ -102,48 +99,44 @@ static int negamax_alpha_beta(const Position *position, Move *best_move,
 	return best_move_eval;
 }
 
-typedef struct SearchInfo {
-	const Position *position;
-	SearchResult *result;
-} SearchInfo;
-
-static void *search(void *arg)
+static void *search_thread(void *arg)
 {
-	SearchInfo *info = (SearchInfo *)arg;
+	Search *search = (Search *)arg;
 
 	size_t depth = 1;
 	while (true) {
-		Move best_move;
-		int best_move_eval =
-			negamax_alpha_beta(info->position, &best_move, depth,
-					   -INT_MAX, INT_MAX,
-					   &info->result->nodes);
-
-		info->result->best_move = best_move;
-		info->result->best_move_eval = best_move_eval;
-		info->result->depth = depth;
-		depth++;
-		if (stop) {
+		if (search->stop_requested) {
 			pthread_exit(NULL);
 			fprintf(stderr, "thread did not exit\n");
-			exit(1);
+			exit(-1);
 		}
+		Move best_move;
+		int best_move_eval =
+			negamax_alpha_beta(search, search->position, &best_move,
+					   depth, -INT_MAX, INT_MAX);
+
+		search->best_move = best_move;
+		search->best_move_eval = best_move_eval;
+		search->depth = depth;
+		depth++;
 	}
 	return NULL;
 }
 
-void start_search(const Position *position, SearchResult *result)
+void search_init(Search *search, const Position *position)
 {
-	if (is_search_thread_running) {
+	*search = (Search){ 0 };
+	search->position = position;
+}
+
+void search_start(Search *search)
+{
+	if (search->running || search->stop_requested) {
 		return;
 	}
-	is_search_thread_running = true;
-	stop = false;
 	table_clear();
-	result->nodes = 0;
-	SearchInfo *info = malloc(sizeof(SearchInfo));
-	*info = (SearchInfo){ .position = position, .result = result };
-	int err = pthread_create(&search_thread, NULL, search, info);
+	search->running = true;
+	int err = pthread_create(&search->thread, NULL, search_thread, search);
 	if (err != 0) {
 		fprintf(stderr, "error: could not create search thread: %s\n",
 			strerror(err));
@@ -151,30 +144,17 @@ void start_search(const Position *position, SearchResult *result)
 	}
 }
 
-void stop_search()
+void search_stop(Search *search)
 {
-	if (!is_search_thread_running) {
+	if (!search->running) {
 		return;
 	}
-	stop = true;
-	int err = pthread_join(search_thread, NULL);
+	search->stop_requested = true;
+	int err = pthread_join(search->thread, NULL);
 	if (err != 0) {
 		fprintf(stderr, "error: could not join search thread: %s\n",
 			strerror(err));
 		exit(-1);
 	}
-	is_search_thread_running = false;
-}
-
-void do_search(const Position *position, unsigned int seconds,
-	       SearchResult *result)
-{
-	start_search(position, result);
-	sleep(seconds);
-	stop_search();
-}
-
-bool is_searching()
-{
-	return is_search_thread_running;
+	search->running = false;
 }

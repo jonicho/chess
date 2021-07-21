@@ -9,23 +9,21 @@
 
 #define CHECKMATE_EVAL 1000000000
 
-typedef struct SearchResult {
+typedef struct Search {
+	const Position *position;
+	pthread_t thread;
+	bool running;
+	bool stop_requested;
+	size_t nodes;
 	Move best_move;
 	int best_move_eval;
 	size_t depth;
-	size_t nodes;
-} SearchResult;
+} Search;
 
-// Starts a search for the best move.
-void start_search(const Position *position, SearchResult *result);
+void search_init(Search *search, const Position *position);
 
-// Stops a running search.
-void stop_search();
+void search_start(Search *search);
 
-// Searches for the best move in a position for the specified amount of seconds.
-void do_search(const Position *position, unsigned int seconds,
-	       SearchResult *result);
-
-bool is_searching();
+void search_stop(Search *search);
 
 #endif

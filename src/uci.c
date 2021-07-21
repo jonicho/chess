@@ -17,7 +17,7 @@
 #include <stdarg.h>
 
 static Position position;
-static SearchResult search_result;
+static Search search;
 static FILE *debug_fd;
 
 static char *uci_read_line()
@@ -57,12 +57,12 @@ static void uci_printf_line(const char *line_format, ...)
 
 static void uci_print_bestmove()
 {
-	uci_printf_line("bestmove %s", move_to_string(search_result.best_move));
+	uci_printf_line("bestmove %s", move_to_string(search.best_move));
 }
 
 static void command_position()
 {
-	if (is_searching()) {
+	if (search.running) {
 		return;
 	}
 	char *token = strtok(NULL, " \n");
@@ -102,11 +102,11 @@ static void command_go()
 	if (strcmp(token, "infinite") == 0) {
 		infinite = true;
 	}
-
-	start_search(&position, &search_result);
+	search_init(&search, &position);
+	search_start(&search);
 	if (!infinite) {
 		sleep(10);
-		stop_search();
+		search_stop(&search);
 		uci_print_bestmove();
 	}
 }
@@ -151,7 +151,7 @@ void uci()
 		} else if (strcmp(command_name, "go") == 0) {
 			command_go();
 		} else if (strcmp(command_name, "stop") == 0) {
-			stop_search();
+			search_stop(&search);
 			uci_print_bestmove();
 		} else if (strcmp(command_name, "quit") == 0) {
 			exit(0);
