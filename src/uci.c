@@ -45,7 +45,6 @@ static void uci_printf(const char *line_format, ...)
 	va_end(argptr);
 	fflush(stdout);
 	if (debug_fd != NULL) {
-		fprintf(debug_fd, "write line: ");
 		va_start(argptr, line_format);
 		vfprintf(debug_fd, line_format, argptr);
 		va_end(argptr);
