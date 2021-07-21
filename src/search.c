@@ -5,7 +5,6 @@
 #include "table.h"
 
 #include <limits.h>
-#include <pthread.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -129,21 +128,25 @@ static void *search_thread(void *arg)
 	return NULL;
 }
 
-void do_search(const Position *position, unsigned int seconds,
-	       SearchResult *result)
+pthread_t start_search(const Position *position, SearchResult *result)
 {
 	table_clear();
 	result->nodes = 0;
-	SearchInfo info = { .position = position, .result = result };
+	SearchInfo *info = malloc(sizeof(SearchInfo));
+	*info = (SearchInfo){ .position = position, .result = result };
 	pthread_t thread;
-	int err = pthread_create(&thread, NULL, search_thread, &info);
+	int err = pthread_create(&thread, NULL, search_thread, info);
 	if (err != 0) {
 		fprintf(stderr, "error: could not create search thread: %s\n",
 			strerror(err));
 		exit(-1);
 	}
-	sleep(seconds);
-	err = pthread_cancel(thread);
+	return thread;
+}
+
+void stop_search(pthread_t thread)
+{
+	int err = pthread_cancel(thread);
 	if (err != 0) {
 		fprintf(stderr, "error: could not cancel search thread: %s\n",
 			strerror(err));
@@ -155,4 +158,12 @@ void do_search(const Position *position, unsigned int seconds,
 			strerror(err));
 		exit(-1);
 	}
+}
+
+void do_search(const Position *position, unsigned int seconds,
+	       SearchResult *result)
+{
+	pthread_t thread = start_search(position, result);
+	sleep(seconds);
+	stop_search(thread);
 }

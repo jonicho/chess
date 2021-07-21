@@ -5,6 +5,7 @@
 #include "move.h"
 
 #include <stddef.h>
+#include <pthread.h>
 
 #define CHECKMATE_EVAL 1000000000
 
@@ -14,6 +15,12 @@ typedef struct SearchResult {
 	size_t depth;
 	size_t nodes;
 } SearchResult;
+
+// Starts a search for the best move.
+pthread_t start_search(const Position *position, SearchResult *result);
+
+// Stops a running search.
+void stop_search(pthread_t thread);
 
 // Searches for the best move in a position for the specified amount of seconds.
 void do_search(const Position *position, unsigned int seconds,

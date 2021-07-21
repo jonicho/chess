@@ -6,6 +6,7 @@
 #include "search.h"
 #include "zobrist.h"
 #include "table.h"
+#include "uci.h"
 
 #include <stdlib.h>
 #include <stddef.h>
@@ -125,6 +126,9 @@ int main(int argc, char const *argv[])
 	} else if (argc > 1 && (strcmp(argv[1], "test") == 0)) {
 		int test_result = test();
 		exit(test_result);
+	} else if (argc > 1 && (strcmp(argv[1], "play") == 0)) {
+		play_game();
 	}
-	play_game();
+
+	uci();
 }
