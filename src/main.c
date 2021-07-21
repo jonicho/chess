@@ -83,6 +83,14 @@ void play_game()
 			} else {
 				printf("\n");
 			}
+			Move *pv = malloc(sizeof(Move) * search_result.depth);
+			size_t pv_length = table_get_pv(
+				game.current_position, search_result.depth, pv);
+			printf("pv: ");
+			for (size_t i = 0; i < pv_length; i++) {
+				printf("%s ", move_to_string(pv[i]));
+			}
+			printf("\n");
 
 			if (!game_make_move(&game, search_result.best_move)) {
 				fprintf(stderr,

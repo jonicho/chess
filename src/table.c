@@ -96,6 +96,20 @@ Move *table_get_best_move(uint64_t hash)
 	return &entry->best_move;
 }
 
+size_t table_get_pv(const Position *position, size_t depth, Move *moves)
+{
+	Position tmp_position = *position;
+	for (size_t i = 0; i < depth; i++) {
+		Move *best_move = table_get_best_move(tmp_position.hash);
+		if (best_move == NULL) {
+			return i;
+		}
+		moves[i] = *best_move;
+		make_move(&tmp_position, *best_move);
+	}
+	return depth;
+}
+
 void table_print_debug()
 {
 	size_t used_buckets = 0;
