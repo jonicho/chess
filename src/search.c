@@ -10,6 +10,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+static pthread_t search_thread;
+static bool is_search_thread_running = false;
+static bool stop = false;
+
 static void sort_moves(const Position *position, Move *moves, size_t num_moves)
 {
 	if (num_moves <= 1) {
@@ -47,6 +51,11 @@ static void sort_moves(const Position *position, Move *moves, size_t num_moves)
 static int negamax_alpha_beta(const Position *position, Move *best_move,
 			      size_t depth, int alpha, int beta, size_t *nodes)
 {
+	if (stop) {
+		pthread_exit(NULL);
+		fprintf(stderr, "thread did not exit\n");
+		exit(1);
+	}
 	(*nodes)++;
 	if (depth == 0) {
 		return eval_position(position);
@@ -89,11 +98,7 @@ static int negamax_alpha_beta(const Position *position, Move *best_move,
 		}
 	}
 	*best_move = moves[best_move_index];
-
-	// temporarily disable cancellation while writing to the transposition table
-	pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
 	table_put(position->hash, *best_move);
-	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 	return best_move_eval;
 }
 
@@ -102,12 +107,9 @@ typedef struct SearchInfo {
 	SearchResult *result;
 } SearchInfo;
 
-static void *search_thread(void *arg)
+static void *search(void *arg)
 {
 	SearchInfo *info = (SearchInfo *)arg;
-	// enable cancellation at any time
-	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
-	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 
 	size_t depth = 1;
 	while (true) {
@@ -117,53 +119,62 @@ static void *search_thread(void *arg)
 					   -INT_MAX, INT_MAX,
 					   &info->result->nodes);
 
-		// temporarily disable cancellation while writing the result
-		pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
 		info->result->best_move = best_move;
 		info->result->best_move_eval = best_move_eval;
 		info->result->depth = depth;
-		pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 		depth++;
+		if (stop) {
+			pthread_exit(NULL);
+			fprintf(stderr, "thread did not exit\n");
+			exit(1);
+		}
 	}
 	return NULL;
 }
 
-pthread_t start_search(const Position *position, SearchResult *result)
+void start_search(const Position *position, SearchResult *result)
 {
+	if (is_search_thread_running) {
+		return;
+	}
+	is_search_thread_running = true;
+	stop = false;
 	table_clear();
 	result->nodes = 0;
 	SearchInfo *info = malloc(sizeof(SearchInfo));
 	*info = (SearchInfo){ .position = position, .result = result };
-	pthread_t thread;
-	int err = pthread_create(&thread, NULL, search_thread, info);
+	int err = pthread_create(&search_thread, NULL, search, info);
 	if (err != 0) {
 		fprintf(stderr, "error: could not create search thread: %s\n",
 			strerror(err));
 		exit(-1);
 	}
-	return thread;
 }
 
-void stop_search(pthread_t thread)
+void stop_search()
 {
-	int err = pthread_cancel(thread);
-	if (err != 0) {
-		fprintf(stderr, "error: could not cancel search thread: %s\n",
-			strerror(err));
-		exit(-1);
+	if (!is_search_thread_running) {
+		return;
 	}
-	err = pthread_join(thread, NULL);
+	stop = true;
+	int err = pthread_join(search_thread, NULL);
 	if (err != 0) {
 		fprintf(stderr, "error: could not join search thread: %s\n",
 			strerror(err));
 		exit(-1);
 	}
+	is_search_thread_running = false;
 }
 
 void do_search(const Position *position, unsigned int seconds,
 	       SearchResult *result)
 {
-	pthread_t thread = start_search(position, result);
+	start_search(position, result);
 	sleep(seconds);
-	stop_search(thread);
+	stop_search();
+}
+
+bool is_searching()
+{
+	return is_search_thread_running;
 }

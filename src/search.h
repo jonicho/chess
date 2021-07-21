@@ -17,13 +17,15 @@ typedef struct SearchResult {
 } SearchResult;
 
 // Starts a search for the best move.
-pthread_t start_search(const Position *position, SearchResult *result);
+void start_search(const Position *position, SearchResult *result);
 
 // Stops a running search.
-void stop_search(pthread_t thread);
+void stop_search();
 
 // Searches for the best move in a position for the specified amount of seconds.
 void do_search(const Position *position, unsigned int seconds,
 	       SearchResult *result);
+
+bool is_searching();
 
 #endif
