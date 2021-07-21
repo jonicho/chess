@@ -37,32 +37,55 @@ static char *uci_read_line()
 	return line;
 }
 
-static void uci_printf_line(const char *line_format, ...)
+static void uci_printf(const char *line_format, ...)
 {
 	va_list argptr;
 	va_start(argptr, line_format);
 	vfprintf(stdout, line_format, argptr);
 	va_end(argptr);
-	fputc('\n', stdout);
 	fflush(stdout);
 	if (debug_fd != NULL) {
 		fprintf(debug_fd, "write line: ");
 		va_start(argptr, line_format);
 		vfprintf(debug_fd, line_format, argptr);
 		va_end(argptr);
-		fputc('\n', debug_fd);
 		fflush(debug_fd);
 	}
 }
 
 static void uci_print_bestmove()
 {
-	uci_printf_line("bestmove %s", move_to_string(search.best_move));
+	uci_printf("bestmove %s\n", move_to_string(search.best_move));
+}
+
+static void uci_print_info(const Search *search)
+{
+	struct timeval time;
+	if (search->stop_time.tv_sec != 0) {
+		time = search->stop_time;
+	} else {
+		gettimeofday(&time, NULL);
+	}
+	size_t elapsed_millis = (time.tv_sec * 1000 + time.tv_usec / 1000) -
+				(search->start_time.tv_sec * 1000 +
+				 search->start_time.tv_usec / 1000);
+	size_t nps = search->nodes / (elapsed_millis / 1000.0);
+
+	uci_printf("info depth %ld time %ld nodes %ld nps %ld score cp %d pv",
+		   search->depth, elapsed_millis, search->nodes, nps,
+		   search->best_move_eval);
+
+	Move *pv = malloc(sizeof(Move) * search->depth);
+	size_t pv_length = table_get_pv(search->position, search->depth, pv);
+	for (size_t i = 0; i < pv_length; i++) {
+		uci_printf(" %s", move_to_string(pv[i]));
+	}
+	uci_printf("\n");
 }
 
 static void command_position()
 {
-	if (search.running) {
+	if (search_is_running(&search)) {
 		return;
 	}
 	char *token = strtok(NULL, " \n");
@@ -102,7 +125,7 @@ static void command_go()
 	if (strcmp(token, "infinite") == 0) {
 		infinite = true;
 	}
-	search_init(&search, &position);
+	search_init(&search, &position, uci_print_info);
 	search_start(&search);
 	if (!infinite) {
 		sleep(10);
@@ -129,10 +152,10 @@ void uci()
 		} while (strcmp(line, "uci") != 0);
 	}
 
-	uci_printf_line("id name chess");
-	uci_printf_line("id author Jonas Richard Keller");
-	uci_printf_line("option name OwnBook type check default true");
-	uci_printf_line("uciok");
+	uci_printf("id name chess\n");
+	uci_printf("id author Jonas Richard Keller\n");
+	uci_printf("option name OwnBook type check default true\n");
+	uci_printf("uciok\n");
 
 	zobrist_init(time(NULL));
 	table_init();
@@ -145,7 +168,7 @@ void uci()
 			continue;
 		}
 		if (strcmp(command_name, "isready") == 0) {
-			uci_printf_line("readyok");
+			uci_printf("readyok\n");
 		} else if (strcmp(command_name, "position") == 0) {
 			command_position();
 		} else if (strcmp(command_name, "go") == 0) {

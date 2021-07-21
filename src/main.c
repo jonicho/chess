@@ -14,10 +14,37 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#include <sys/time.h>
 
 #define SEARCH_SECONDS 10
+#define EVAL_STRING_LENGTH 256
 
-void play_game()
+static void print_search_info(const Search *search)
+{
+	struct timeval time;
+	if (search->stop_time.tv_sec != 0) {
+		time = search->stop_time;
+	} else {
+		gettimeofday(&time, NULL);
+	}
+	size_t elapsed_millis = (time.tv_sec * 1000 + time.tv_usec / 1000) -
+				(search->start_time.tv_sec * 1000 +
+				 search->start_time.tv_usec / 1000);
+	size_t nps = search->nodes / (elapsed_millis / 1000.0);
+	char eval_string[EVAL_STRING_LENGTH];
+	search_eval_to_string(search, eval_string, EVAL_STRING_LENGTH);
+	printf("search: depth: %2ld, time: %7ld, nodes: %12ld, nps: %8ld, best move eval: %6s, pv:",
+	       search->depth, elapsed_millis, search->nodes, nps, eval_string);
+
+	Move *pv = malloc(sizeof(Move) * search->depth);
+	size_t pv_length = table_get_pv(search->position, search->depth, pv);
+	for (size_t i = 0; i < pv_length; i++) {
+		printf(" %s", move_to_string(pv[i]));
+	}
+	printf("\n");
+}
+
+static void play_game()
 {
 	zobrist_init(time(NULL));
 	table_init();
@@ -53,44 +80,13 @@ void play_game()
 					     "black",
 			       SEARCH_SECONDS);
 			Search search;
-			search_init(&search, game.current_position);
+			search_init(&search, game.current_position,
+				    print_search_info);
 			search_start(&search);
 			sleep(SEARCH_SECONDS);
 			search_stop(&search);
-			printf("Search completed: depth: %ld, nodes searched: %ld, nps: %ld, best move: %s, best move eval: %d",
-			       search.depth, search.nodes,
-			       search.nodes / SEARCH_SECONDS,
-			       move_to_string(search.best_move),
-			       search.best_move_eval);
-
-			if (search.best_move_eval >= CHECKMATE_EVAL) {
-				int moves_until_win =
-					(-search.best_move_eval +
-					 CHECKMATE_EVAL + (int)search.depth) /
-						2 +
-					1;
-				printf(" (winning in %d move%s)\n",
-				       moves_until_win,
-				       moves_until_win == 1 ? "" : "s");
-			} else if (search.best_move_eval <= -CHECKMATE_EVAL) {
-				int moves_until_lose =
-					(search.best_move_eval +
-					 CHECKMATE_EVAL + (int)search.depth) /
-					2;
-				printf(" (losing in %d move%s)\n",
-				       moves_until_lose,
-				       moves_until_lose == 1 ? "" : "s");
-			} else {
-				printf("\n");
-			}
-			Move *pv = malloc(sizeof(Move) * search.depth);
-			size_t pv_length = table_get_pv(game.current_position,
-							search.depth, pv);
-			printf("pv: ");
-			for (size_t i = 0; i < pv_length; i++) {
-				printf("%s ", move_to_string(pv[i]));
-			}
-			printf("\n");
+			printf("search finished\n");
+			print_search_info(&search);
 
 			if (!game_make_move(&game, search.best_move)) {
 				fprintf(stderr,

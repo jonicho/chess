@@ -118,24 +118,26 @@ static void *search_thread(void *arg)
 		search->best_move = best_move;
 		search->best_move_eval = best_move_eval;
 		search->depth = depth;
+		search->callback(search);
 		depth++;
 	}
 	return NULL;
 }
 
-void search_init(Search *search, const Position *position)
+void search_init(Search *search, const Position *position, Callback callback)
 {
 	*search = (Search){ 0 };
 	search->position = position;
+	search->callback = callback;
 }
 
 void search_start(Search *search)
 {
-	if (search->running || search->stop_requested) {
+	if (search_is_running(search) || search->stop_requested) {
 		return;
 	}
 	table_clear();
-	search->running = true;
+	gettimeofday(&search->start_time, NULL);
 	int err = pthread_create(&search->thread, NULL, search_thread, search);
 	if (err != 0) {
 		fprintf(stderr, "error: could not create search thread: %s\n",
@@ -146,7 +148,7 @@ void search_start(Search *search)
 
 void search_stop(Search *search)
 {
-	if (!search->running) {
+	if (!search_is_running(search)) {
 		return;
 	}
 	search->stop_requested = true;
@@ -156,5 +158,33 @@ void search_stop(Search *search)
 			strerror(err));
 		exit(-1);
 	}
-	search->running = false;
+	gettimeofday(&search->stop_time, NULL);
+}
+
+bool search_is_running(const Search *search)
+{
+	return search->start_time.tv_sec != 0 && search->stop_time.tv_sec == 0;
+}
+
+void search_eval_to_string(const Search *search, char *buffer,
+			   size_t buffer_size)
+{
+	if (search->best_move_eval >= CHECKMATE_EVAL) {
+		int moves_until_win = (-search->best_move_eval +
+				       CHECKMATE_EVAL + (int)search->depth) /
+					      2 +
+				      1;
+		snprintf(buffer, buffer_size, "%d (winning in %d move%s)",
+			 search->best_move_eval, moves_until_win,
+			 moves_until_win == 1 ? "" : "s");
+	} else if (search->best_move_eval <= -CHECKMATE_EVAL) {
+		int moves_until_lose = (search->best_move_eval +
+					CHECKMATE_EVAL + (int)search->depth) /
+				       2;
+		snprintf(buffer, buffer_size, "%d (losing in %d move%s)",
+			 search->best_move_eval, moves_until_lose,
+			 moves_until_lose == 1 ? "" : "s");
+	} else {
+		snprintf(buffer, buffer_size, "%d", search->best_move_eval);
+	}
 }
