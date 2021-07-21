@@ -95,11 +95,21 @@ static void command_position()
 	if (strcmp(token, "startpos") == 0) {
 		position = *fen_to_position(FEN_STARTING_POSITION);
 	} else if (strcmp(token, "fen") == 0) {
-		char *fen_string = strtok(NULL, " \n");
-		if (fen_string == NULL) {
+		char *tokens[6];
+		for (size_t i = 0; i < sizeof(tokens) / sizeof(tokens[0]);
+		     i++) {
+			tokens[i] = strtok(NULL, " \n");
+		}
+		char fen_string[256];
+		snprintf(fen_string, sizeof(fen_string), "%s %s %s %s %s %s",
+			 tokens[0], tokens[1], tokens[2], tokens[3], tokens[4],
+			 tokens[5]);
+
+		Position *position_ptr = fen_to_position(fen_string);
+		if (position_ptr == NULL) {
 			return;
 		}
-		position = *fen_to_position(fen_string);
+		position = *position_ptr;
 	} else {
 		return;
 	}
