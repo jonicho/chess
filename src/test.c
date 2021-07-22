@@ -1,8 +1,10 @@
 #include "test.h"
 
 #include "position.h"
+#include "move.h"
 #include "fen.h"
 #include "perft.h"
+#include "move_gen.h"
 
 #include <stddef.h>
 #include <stdbool.h>
@@ -131,20 +133,80 @@ bool test_position(const TestData *test_data)
 	return true;
 }
 
+bool test_captures_only(const char *position_fen)
+{
+	const Position *position = fen_to_position(position_fen);
+	if (position == NULL) {
+		printf("test: Failed to parse fen string: %s\n", position_fen);
+		return false;
+	}
+	Move all_moves[MAX_MOVES];
+	size_t num_all_moves = gen_legal_moves(all_moves, position, false);
+	Move captures[MAX_MOVES];
+	size_t num_captures = gen_legal_moves(captures, position, true);
+	// check that all captures are in all_moves
+	for (size_t i = 0; i < num_captures; i++) {
+		bool found = false;
+		for (size_t j = 0; j < num_all_moves; j++) {
+			if (MOVE_EQ(all_moves[j], captures[i])) {
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			printf("test: Capture %s is not in all_moves for position %s\n",
+			       move_to_string(captures[i]), position_fen);
+			return false;
+		}
+	}
+	// check that all captures are in captures and all non-captures are not in captures
+	for (size_t i = 0; i < num_all_moves; i++) {
+		bool found = false;
+		for (size_t j = 0; j < num_captures; j++) {
+			if (MOVE_EQ(all_moves[i], captures[j])) {
+				found = true;
+				break;
+			}
+		}
+		bool is_capture =
+			PIECE_TYPE(position->squares[all_moves[i].dst]) !=
+				EMPTY ||
+			(PIECE_TYPE(position->squares[all_moves[i].src]) ==
+				 PAWN &&
+			 all_moves[i].dst ==
+				 position->en_passant_target_square);
+		if (found != is_capture) {
+			printf("test: %s is%s in captures but is%s a capture for position %s\n",
+			       move_to_string(all_moves[i]),
+			       found ? "" : " not", is_capture ? "" : " not",
+			       position_fen);
+			return false;
+		}
+	}
+	return true;
+}
+
 int test()
 {
+	size_t num_tests = 0;
 	size_t num_passed = 0;
 
 	for (size_t i = 0; i < NUM_TEST_DATA; i++) {
+		num_tests++;
 		if (test_position(test_data_list + i)) {
+			num_passed++;
+		}
+
+		num_tests++;
+		if (test_captures_only(test_data_list[i].position_fen)) {
 			num_passed++;
 		}
 	}
 
 	printf("test: %ld out of %ld tests passed (%.2f%%)\n", num_passed,
-	       NUM_TEST_DATA, (double)num_passed / (double)NUM_TEST_DATA * 100);
+	       num_tests, (double)num_passed / (double)num_tests * 100);
 
-	if (num_passed != NUM_TEST_DATA) {
+	if (num_passed != num_tests) {
 		printf("test: There were test failures. See above for details.\n");
 		return -1;
 	}

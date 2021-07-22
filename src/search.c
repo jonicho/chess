@@ -55,7 +55,7 @@ static int negamax_alpha_beta(Search *search, const Position *position,
 	}
 
 	Move moves[MAX_MOVES];
-	size_t num_moves = gen_moves(moves, position);
+	size_t num_moves = gen_moves(moves, position, false);
 	sort_moves(position, moves, num_moves);
 	size_t best_move_index = -1;
 	int best_move_eval = INT_MIN;

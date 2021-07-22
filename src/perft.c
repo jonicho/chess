@@ -16,7 +16,7 @@ size_t perft(const Position *position, size_t depth, bool print)
 	size_t nodes = 0;
 
 	Move moves[MAX_MOVES];
-	size_t num_moves = gen_moves(moves, position);
+	size_t num_moves = gen_moves(moves, position, false);
 
 	Position temp_position;
 

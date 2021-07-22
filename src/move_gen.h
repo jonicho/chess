@@ -8,10 +8,11 @@
 
 // Generates all pseudo legal moves.
 // Returns the number of moves generated.
-size_t gen_moves(Move *moves, const Position *position);
+size_t gen_moves(Move *moves, const Position *position, bool captures_only);
 
 // Generates all legal moves.
 // Returns the number of moves generated.
-size_t gen_legal_moves(Move *moves, const Position *position);
+size_t gen_legal_moves(Move *moves, const Position *position,
+		       bool captures_only);
 
 #endif

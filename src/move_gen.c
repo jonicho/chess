@@ -28,31 +28,35 @@
 		(moves)++;                                                     \
 	}
 
-void gen_pawn_moves(Move **moves, const Position *position, uint8_t square)
+void gen_pawn_moves(Move **moves, const Position *position, uint8_t square,
+		    bool captures_only)
 {
 	int8_t dir = position->side_to_move == WHITE ? 1 : -1;
 
-	{
-		uint8_t dest_square = square + (dir * 10);
-		uint8_t dest_piece = position->squares[dest_square];
-		if (PIECE_TYPE(dest_piece) == EMPTY) {
-			if (SQUARE_TO_RANK(dest_square) == 0 ||
-			    SQUARE_TO_RANK(dest_square) == 7) {
-				PUSH_PROMOTION_MOVES(*moves, square,
-						     dest_square);
-			} else {
-				PUSH_MOVE(*moves, square, dest_square);
+	if (!captures_only) {
+		{
+			uint8_t dest_square = square + (dir * 10);
+			uint8_t dest_piece = position->squares[dest_square];
+			if (PIECE_TYPE(dest_piece) == EMPTY) {
+				if (SQUARE_TO_RANK(dest_square) == 0 ||
+				    SQUARE_TO_RANK(dest_square) == 7) {
+					PUSH_PROMOTION_MOVES(*moves, square,
+							     dest_square);
+				} else {
+					PUSH_MOVE(*moves, square, dest_square);
+				}
 			}
 		}
-	}
-	if (SQUARE_TO_RANK(square) ==
-	    (position->side_to_move == WHITE ? 1 : 6)) {
-		uint8_t dest_square = square + (dir * 20);
-		uint8_t dest_piece = position->squares[dest_square];
-		if (PIECE_TYPE(dest_piece) == EMPTY &&
-		    PIECE_TYPE(position->squares[square + (dir * 10)]) ==
-			    EMPTY) {
-			PUSH_MOVE(*moves, square, dest_square);
+		if (SQUARE_TO_RANK(square) ==
+		    (position->side_to_move == WHITE ? 1 : 6)) {
+			uint8_t dest_square = square + (dir * 20);
+			uint8_t dest_piece = position->squares[dest_square];
+			if (PIECE_TYPE(dest_piece) == EMPTY &&
+			    PIECE_TYPE(
+				    position->squares[square + (dir * 10)]) ==
+				    EMPTY) {
+				PUSH_MOVE(*moves, square, dest_square);
+			}
 		}
 	}
 	for (size_t i = 0; i < sizeof(PAWN_CAPTURES); i++) {
@@ -76,7 +80,8 @@ void gen_pawn_moves(Move **moves, const Position *position, uint8_t square)
 	}
 }
 
-void gen_knight_moves(Move **moves, const Position *position, uint8_t square)
+void gen_knight_moves(Move **moves, const Position *position, uint8_t square,
+		      bool captures_only)
 {
 	for (size_t i = 0; i < sizeof(KNIGHT_MOVES); i++) {
 		uint8_t dest_square = square + KNIGHT_MOVES[i];
@@ -88,11 +93,15 @@ void gen_knight_moves(Move **moves, const Position *position, uint8_t square)
 		    PIECE_COLOR(dest_piece) == position->side_to_move) {
 			continue;
 		}
+		if (PIECE_TYPE(dest_piece) == EMPTY && captures_only) {
+			continue;
+		}
 		PUSH_MOVE(*moves, square, dest_square);
 	}
 }
 
-void gen_bishop_moves(Move **moves, const Position *position, uint8_t square)
+void gen_bishop_moves(Move **moves, const Position *position, uint8_t square,
+		      bool captures_only)
 {
 	for (size_t i = 0; i < sizeof(BISHOP_DIRECTIONS); i++) {
 		uint8_t dest_square = square;
@@ -108,13 +117,16 @@ void gen_bishop_moves(Move **moves, const Position *position, uint8_t square)
 					PUSH_MOVE(*moves, square, dest_square);
 				}
 				break;
+			} else if (captures_only) {
+				continue;
 			}
 			PUSH_MOVE(*moves, square, dest_square);
 		}
 	}
 }
 
-void gen_rook_moves(Move **moves, const Position *position, uint8_t square)
+void gen_rook_moves(Move **moves, const Position *position, uint8_t square,
+		    bool captures_only)
 {
 	for (size_t i = 0; i < sizeof(ROOK_DIRECTIONS); i++) {
 		uint8_t dest_square = square;
@@ -130,13 +142,16 @@ void gen_rook_moves(Move **moves, const Position *position, uint8_t square)
 					PUSH_MOVE(*moves, square, dest_square);
 				}
 				break;
+			} else if (captures_only) {
+				continue;
 			}
 			PUSH_MOVE(*moves, square, dest_square);
 		}
 	}
 }
 
-void gen_queen_moves(Move **moves, const Position *position, uint8_t square)
+void gen_queen_moves(Move **moves, const Position *position, uint8_t square,
+		     bool captures_only)
 {
 	for (size_t i = 0; i < sizeof(QUEEN_DIRECTIONS); i++) {
 		uint8_t dest_square = square;
@@ -152,20 +167,24 @@ void gen_queen_moves(Move **moves, const Position *position, uint8_t square)
 					PUSH_MOVE(*moves, square, dest_square);
 				}
 				break;
+			} else if (captures_only) {
+				continue;
 			}
 			PUSH_MOVE(*moves, square, dest_square);
 		}
 	}
 }
 
-void gen_king_moves(Move **moves, const Position *position, uint8_t square)
+void gen_king_moves(Move **moves, const Position *position, uint8_t square,
+		    bool captures_only)
 {
 	for (size_t i = 0; i < sizeof(KING_MOVES); i++) {
 		uint8_t dest_square = square + KING_MOVES[i];
 		uint8_t dest_piece = position->squares[dest_square];
 		if (dest_piece == OFF_BOARD ||
 		    (PIECE_TYPE(dest_piece) != EMPTY &&
-		     PIECE_COLOR(dest_piece) == position->side_to_move)) {
+		     PIECE_COLOR(dest_piece) == position->side_to_move) ||
+		    (PIECE_TYPE(dest_piece) == EMPTY && captures_only)) {
 			continue;
 		}
 		PUSH_MOVE(*moves, square, dest_square);
@@ -227,7 +246,7 @@ void gen_castling_moves(Move **moves, const Position *position)
 }
 
 static void gen_moves_square(Move **moves, const Position *position,
-			     uint8_t square)
+			     uint8_t square, bool captures_only)
 {
 	uint8_t piece = position->squares[square];
 	if (PIECE_COLOR(piece) != position->side_to_move) {
@@ -237,22 +256,22 @@ static void gen_moves_square(Move **moves, const Position *position,
 	case EMPTY:
 		return;
 	case PAWN:
-		gen_pawn_moves(moves, position, square);
+		gen_pawn_moves(moves, position, square, captures_only);
 		break;
 	case KNIGHT:
-		gen_knight_moves(moves, position, square);
+		gen_knight_moves(moves, position, square, captures_only);
 		break;
 	case BISHOP:
-		gen_bishop_moves(moves, position, square);
+		gen_bishop_moves(moves, position, square, captures_only);
 		break;
 	case ROOK:
-		gen_rook_moves(moves, position, square);
+		gen_rook_moves(moves, position, square, captures_only);
 		break;
 	case QUEEN:
-		gen_queen_moves(moves, position, square);
+		gen_queen_moves(moves, position, square, captures_only);
 		break;
 	case KING:
-		gen_king_moves(moves, position, square);
+		gen_king_moves(moves, position, square, captures_only);
 		break;
 
 	default:
@@ -260,32 +279,35 @@ static void gen_moves_square(Move **moves, const Position *position,
 	}
 }
 
-size_t gen_moves(Move *moves, const Position *position)
+size_t gen_moves(Move *moves, const Position *position, bool captures_only)
 {
 	Move *initial_moves = moves;
 	if (position->side_to_move == WHITE) {
 		for (int rank = 7; rank >= 0; rank--) {
 			for (int file = 0; file < 8; file++) {
 				gen_moves_square(&moves, position,
-						 RF(rank, file));
+						 RF(rank, file), captures_only);
 			}
 		}
 	} else {
 		for (int rank = 0; rank < 8; rank++) {
 			for (int file = 0; file < 8; file++) {
 				gen_moves_square(&moves, position,
-						 RF(rank, file));
+						 RF(rank, file), captures_only);
 			}
 		}
 	}
-	gen_castling_moves(&moves, position);
+	if (!captures_only) {
+		gen_castling_moves(&moves, position);
+	}
 
 	return moves - initial_moves;
 }
 
-size_t gen_legal_moves(Move *moves, const Position *position)
+size_t gen_legal_moves(Move *moves, const Position *position,
+		       bool captures_only)
 {
-	size_t num_moves = gen_moves(moves, position);
+	size_t num_moves = gen_moves(moves, position, captures_only);
 	size_t num_legal_moves = 0;
 	for (size_t i = 0; i < num_moves; i++) {
 		Position temp_position = *position;

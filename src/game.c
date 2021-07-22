@@ -21,7 +21,8 @@ bool game_make_move(Game *game, Move move)
 	}
 
 	Move moves[MAX_MOVES];
-	size_t num_moves = gen_legal_moves(moves, game->current_position);
+	size_t num_moves =
+		gen_legal_moves(moves, game->current_position, false);
 	bool is_move_legal = false;
 
 	for (size_t i = 0; i < num_moves; i++) {
@@ -47,7 +48,7 @@ bool game_make_move(Game *game, Move move)
 
 	Move tmp_moves[MAX_MOVES];
 	bool has_game_ended =
-		gen_legal_moves(tmp_moves, game->current_position) == 0;
+		gen_legal_moves(tmp_moves, game->current_position, false) == 0;
 	if (has_game_ended) {
 		if (is_king_in_check(game->current_position,
 				     game->current_position->side_to_move)) {
