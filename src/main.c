@@ -32,7 +32,7 @@ static void print_search_info(const Search *search)
 	size_t nps = search->nodes / (elapsed_millis / 1000.0);
 	char eval_string[256];
 	search_eval_to_string(search, eval_string, sizeof(eval_string));
-	printf("search: depth: %2ld, time: %7ld, nodes: %12ld, nps: %8ld, best move eval: %6s, pv:",
+	printf("search: depth: %2d, time: %7ld, nodes: %12ld, nps: %8ld, best move eval: %6s, pv:",
 	       search->depth, elapsed_millis, search->nodes, nps, eval_string);
 
 	Move *pv = malloc(sizeof(Move) * search->depth);

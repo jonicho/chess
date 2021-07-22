@@ -23,7 +23,7 @@ struct Search {
 	size_t nodes;
 	Move best_move;
 	int best_move_eval;
-	size_t depth;
+	int8_t depth;
 	Callback callback;
 };
 

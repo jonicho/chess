@@ -41,7 +41,7 @@ static void sort_moves(const Position *position, Move *moves, size_t num_moves)
 }
 
 static int negamax_alpha_beta(Search *search, const Position *position,
-			      Move *best_move, size_t depth, int alpha,
+			      Move *best_move, int8_t depth, int alpha,
 			      int beta)
 {
 	if (search->stop_requested) {
@@ -100,7 +100,7 @@ static void *search_thread(void *arg)
 {
 	Search *search = (Search *)arg;
 
-	size_t depth = 1;
+	int8_t depth = 1;
 	while (true) {
 		if (search->stop_requested) {
 			pthread_exit(NULL);

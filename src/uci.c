@@ -70,7 +70,7 @@ static void uci_print_info(const Search *search)
 				 search->start_time.tv_usec / 1000);
 	size_t nps = search->nodes / (elapsed_millis / 1000.0);
 
-	uci_printf("info depth %ld time %ld nodes %ld nps %ld score cp %d pv",
+	uci_printf("info depth %d time %ld nodes %ld nps %ld score cp %d pv",
 		   search->depth, elapsed_millis, search->nodes, nps,
 		   search->best_move_eval);
 

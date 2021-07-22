@@ -34,7 +34,7 @@ void table_clear()
 	table->num_entries = 0;
 }
 
-void table_put(uint64_t hash, Move best_move, uint8_t depth)
+void table_put(uint64_t hash, Move best_move, int8_t depth)
 {
 	Entry *bucket = &table->buckets[hash % TABLE_NUM_BUCKETS];
 	if (bucket->hash == hash) {
