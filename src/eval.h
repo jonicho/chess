@@ -9,6 +9,6 @@ int eval_position(const Position *position);
 
 // Evaluates a move.
 // The higher the return value the better the move.
-int eval_move(const Position *position, const Move *move);
+int eval_move(const Position *position, const Move move);
 
 #endif

@@ -115,11 +115,11 @@ static void command_position()
 	token = strtok(NULL, " \n");
 	if (token != NULL && strcmp(token, "moves") == 0) {
 		while ((token = strtok(NULL, " \n")) != NULL) {
-			Move *move = move_from_string(token);
-			if (move == NULL) {
+			Move move = move_from_string(token);
+			if (IS_NO_MOVE(move)) {
 				continue;
 			}
-			make_move(&position, *move);
+			make_move(&position, move);
 		}
 	}
 }

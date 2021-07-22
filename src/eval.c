@@ -24,7 +24,7 @@ int eval_position(const Position *position)
 	return position->side_to_move == WHITE ? eval : -eval;
 }
 
-int eval_move(const Position *position, const Move *move)
+int eval_move(const Position *position, const Move move)
 {
-	return piece_values[PIECE_TYPE(position->squares[move->dst])];
+	return piece_values[PIECE_TYPE(position->squares[move.dst])];
 }

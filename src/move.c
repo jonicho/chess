@@ -191,7 +191,7 @@ char *move_to_string(Move move)
 	return string;
 }
 
-Move *move_from_string(const char *string)
+Move move_from_string(const char *string)
 {
 	uint8_t src_file = string[0] - 'a';
 	uint8_t src_rank = string[1] - '1';
@@ -215,16 +215,16 @@ Move *move_from_string(const char *string)
 		promotion_piece = KNIGHT;
 		break;
 	default:
-		return NULL;
+		return NO_MOVE;
 		break;
 	}
 	if (src_file > 7 || src_rank > 7 || dst_file > 7 || dst_rank > 7 ||
 	    (string[4] != '\0' && string[5] != '\0')) {
-		return NULL;
+		return NO_MOVE;
 	}
-	Move *move = malloc(sizeof(Move));
-	move->src = RF(src_rank, src_file);
-	move->dst = RF(dst_rank, dst_file);
-	move->promotion_piece = promotion_piece;
-	return move;
+	return (Move){
+		.src = RF(src_rank, src_file),
+		.dst = RF(dst_rank, dst_file),
+		.promotion_piece = promotion_piece,
+	};
 }

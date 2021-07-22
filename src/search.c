@@ -14,17 +14,14 @@ static void sort_moves(const Position *position, Move *moves, size_t num_moves)
 	if (num_moves <= 1) {
 		return;
 	}
-	const Move *best_move = table_get_best_move(position->hash);
+	const Move best_move = table_get_best_move(position->hash);
 
 	int evals[MAX_MOVES];
 	for (size_t i = 0; i < num_moves; i++) {
-		if (best_move != NULL && (moves + i)->src == best_move->src &&
-		    (moves + i)->dst == best_move->dst &&
-		    (moves + i)->promotion_piece ==
-			    best_move->promotion_piece) {
+		if (MOVE_EQ(moves[i], best_move)) {
 			evals[i] = INT_MAX;
 		} else {
-			evals[i] = eval_move(position, moves + i);
+			evals[i] = eval_move(position, moves[i]);
 		}
 	}
 

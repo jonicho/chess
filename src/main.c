@@ -110,8 +110,8 @@ static void play_game()
 				exit(-1);
 			}
 			line[--nread] = '\0'; // remove trailing newline
-			Move *move = move_from_string(line);
-			if (move == NULL || !game_make_move(&game, *move)) {
+			Move move = move_from_string(line);
+			if (IS_NO_MOVE(move) || !game_make_move(&game, move)) {
 				invalid_move = true;
 				printf("Invalid move, try again: ");
 			}

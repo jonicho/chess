@@ -76,14 +76,14 @@ void table_put(uint64_t hash, Move best_move, uint8_t depth)
 	table->num_entries++;
 }
 
-Move *table_get_best_move(uint64_t hash)
+Move table_get_best_move(uint64_t hash)
 {
 	Entry *bucket = &table->buckets[hash % TABLE_NUM_BUCKETS];
 	if (bucket->hash == hash) {
-		return &bucket->best_move;
+		return bucket->best_move;
 	}
 	if (bucket->hash == 0) {
-		return NULL;
+		return NO_MOVE;
 	}
 
 	Entry *entry = bucket->next;
@@ -91,21 +91,21 @@ Move *table_get_best_move(uint64_t hash)
 		entry = entry->next;
 	}
 	if (entry == NULL) {
-		return NULL;
+		return NO_MOVE;
 	}
-	return &entry->best_move;
+	return entry->best_move;
 }
 
 size_t table_get_pv(const Position *position, size_t depth, Move *moves)
 {
 	Position tmp_position = *position;
 	for (size_t i = 0; i < depth; i++) {
-		Move *best_move = table_get_best_move(tmp_position.hash);
-		if (best_move == NULL) {
+		Move best_move = table_get_best_move(tmp_position.hash);
+		if (IS_NO_MOVE(best_move)) {
 			return i;
 		}
-		moves[i] = *best_move;
-		make_move(&tmp_position, *best_move);
+		moves[i] = best_move;
+		make_move(&tmp_position, best_move);
 	}
 	return depth;
 }

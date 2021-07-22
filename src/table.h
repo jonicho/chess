@@ -24,7 +24,7 @@ typedef struct Table {
 void table_init();
 void table_clear();
 void table_put(uint64_t hash, Move best_move, uint8_t depth);
-Move *table_get_best_move(uint64_t hash);
+Move table_get_best_move(uint64_t hash);
 size_t table_get_pv(const Position *position, size_t depth, Move *moves);
 
 void table_print_debug();
