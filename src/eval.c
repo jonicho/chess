@@ -2,8 +2,13 @@
 
 // piece values from https://www.chessprogramming.org/Simplified_Evaluation_Function
 static const int piece_values[] = {
-	[EMPTY] = 0,  [PAWN] = 100,  [KNIGHT] = 320, [BISHOP] = 330,
-	[ROOK] = 500, [QUEEN] = 900, [KING] = 20000,
+	[EMPTY | WHITE] = 0,	 [PAWN | WHITE] = 100,
+	[KNIGHT | WHITE] = 320,	 [BISHOP | WHITE] = 330,
+	[ROOK | WHITE] = 500,	 [QUEEN | WHITE] = 900,
+	[KING | WHITE] = 20000,	 [EMPTY | BLACK] = 0,
+	[PAWN | BLACK] = -100,	 [KNIGHT | BLACK] = -320,
+	[BISHOP | BLACK] = -330, [ROOK | BLACK] = -500,
+	[QUEEN | BLACK] = -900,	 [KING | BLACK] = -20000,
 };
 
 int eval_position(const Position *position)
@@ -13,12 +18,7 @@ int eval_position(const Position *position)
 		for (int file = 0; file < 8; file++) {
 			uint8_t square = RF(rank, file);
 			uint8_t piece = position->squares[square];
-
-			if (PIECE_COLOR(piece) == WHITE) {
-				eval += piece_values[PIECE_TYPE(piece)];
-			} else {
-				eval -= piece_values[PIECE_TYPE(piece)];
-			}
+			eval += piece_values[piece];
 		}
 	}
 	return position->side_to_move == WHITE ? eval : -eval;
