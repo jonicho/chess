@@ -41,8 +41,7 @@ static void sort_moves(const Position *position, Move *moves, size_t num_moves)
 }
 
 static int negamax_alpha_beta(Search *search, const Position *position,
-			      Move *best_move, int8_t depth, int alpha,
-			      int beta)
+			      int8_t depth, int alpha, int beta)
 {
 	if (search->stop_requested) {
 		pthread_exit(NULL);
@@ -68,10 +67,8 @@ static int negamax_alpha_beta(Search *search, const Position *position,
 			continue;
 		}
 		no_more_moves = false;
-		Move dummy_move;
-		int eval =
-			-negamax_alpha_beta(search, &temp_position, &dummy_move,
-					    depth - 1, -beta, -alpha);
+		int eval = -negamax_alpha_beta(search, &temp_position,
+					       depth - 1, -beta, -alpha);
 
 		if (eval > best_move_eval) {
 			best_move_eval = eval;
@@ -91,8 +88,7 @@ static int negamax_alpha_beta(Search *search, const Position *position,
 			return 0;
 		}
 	}
-	*best_move = moves[best_move_index];
-	table_put(position->hash, *best_move, depth);
+	table_put(position->hash, moves[best_move_index], depth);
 	return best_move_eval;
 }
 
@@ -107,12 +103,10 @@ static void *search_thread(void *arg)
 			fprintf(stderr, "thread did not exit\n");
 			exit(-1);
 		}
-		Move best_move;
-		int best_move_eval =
-			negamax_alpha_beta(search, search->position, &best_move,
-					   depth, -INT_MAX, INT_MAX);
+		int best_move_eval = negamax_alpha_beta(
+			search, search->position, depth, -INT_MAX, INT_MAX);
 
-		search->best_move = best_move;
+		search->best_move = table_get_best_move(search->position->hash);
 		search->best_move_eval = best_move_eval;
 		search->depth = depth;
 		search->callback(search);
