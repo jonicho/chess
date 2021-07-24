@@ -88,7 +88,7 @@ static int negamax_alpha_beta(Search *search, const Position *position,
 		if (is_king_in_check(position, position->side_to_move)) {
 			return -CHECKMATE_EVAL - depth;
 		} else {
-			return eval_position(position);
+			return 0;
 		}
 	}
 	*best_move = moves[best_move_index];
