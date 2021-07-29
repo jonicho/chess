@@ -131,6 +131,7 @@ int main(int argc, char const *argv[])
 		exit(test_result);
 	} else if (argc > 1 && (strcmp(argv[1], "play") == 0)) {
 		play_game();
+		exit(0);
 	}
 
 	uci();
