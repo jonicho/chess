@@ -78,6 +78,9 @@ static int negamax_alpha_beta(Search *search, const Position *position,
 	size_t num_moves = gen_moves(moves, position, false);
 	sort_moves(position, moves, num_moves);
 	for (size_t i = 0; i < num_moves; i++) {
+		if (MOVE_EQ(moves[i], table_best_move)) {
+			continue;
+		}
 		Position temp_position = *position;
 		make_move(&temp_position, moves[i]);
 		if (is_king_in_check(&temp_position,
