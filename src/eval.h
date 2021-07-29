@@ -4,6 +4,8 @@
 #include "position.h"
 #include "move.h"
 
+extern const int piece_values[16];
+
 // Evaluates a position in the point of view of the current side to move.
 int eval_position(const Position *position);
 

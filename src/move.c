@@ -1,6 +1,7 @@
 #include "move.h"
 
 #include "zobrist.h"
+#include "eval.h"
 
 #include <stdlib.h>
 
@@ -9,6 +10,11 @@ static void put_piece(Position *position, uint8_t square, uint8_t piece)
 	position->hash ^=
 		zobrist_piece_hashes[square][position->squares[square]] ^
 		zobrist_piece_hashes[square][piece];
+
+	position->eval += (piece_values[piece] -
+			   piece_values[position->squares[square]]) *
+			  (position->side_to_move == WHITE ? 1 : -1);
+
 	position->squares[square] = piece;
 }
 
@@ -114,6 +120,7 @@ void make_move(Position *position, Move move)
 	// flip side to move
 	position->side_to_move ^= BLACK;
 	position->hash ^= zobrist_black_to_move_hash;
+	position->eval = -position->eval;
 
 	// en passant target square
 	{

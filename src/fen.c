@@ -1,6 +1,7 @@
 #include "fen.h"
 
 #include "zobrist.h"
+#include "eval.h"
 
 #include <stdlib.h>
 
@@ -160,6 +161,7 @@ Position *fen_to_position(const char *fen)
 	}
 
 	position->hash = zobrist_generate_hash(position);
+	position->eval = eval_position(position);
 
 	return position;
 }

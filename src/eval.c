@@ -1,7 +1,9 @@
 #include "eval.h"
 
+#include "move_gen.h"
+
 // piece values from https://www.chessprogramming.org/Simplified_Evaluation_Function
-static const int piece_values[] = {
+const int piece_values[] = {
 	[EMPTY | WHITE] = 0,	 [PAWN | WHITE] = 100,
 	[KNIGHT | WHITE] = 320,	 [BISHOP | WHITE] = 330,
 	[ROOK | WHITE] = 500,	 [QUEEN | WHITE] = 900,

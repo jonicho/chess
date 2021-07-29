@@ -50,7 +50,7 @@ static int negamax_alpha_beta(Search *search, const Position *position,
 	}
 	search->nodes++;
 	if (depth == 0) {
-		return eval_position(position);
+		return position->eval;
 	}
 
 	Move moves[MAX_MOVES];

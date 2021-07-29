@@ -56,6 +56,7 @@ typedef struct Position {
 	uint8_t halfmove_clock;
 	uint16_t fullmove_counter;
 	uint64_t hash;
+	int eval;
 } Position;
 
 extern const int8_t PAWN_CAPTURES[2];
