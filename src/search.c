@@ -14,15 +14,10 @@ static void sort_moves(const Position *position, Move *moves, size_t num_moves)
 	if (num_moves <= 1) {
 		return;
 	}
-	const Move best_move = table_get_best_move(position->hash);
 
 	int evals[MAX_MOVES];
 	for (size_t i = 0; i < num_moves; i++) {
-		if (MOVE_EQ(moves[i], best_move)) {
-			evals[i] = INT_MAX;
-		} else {
-			evals[i] = eval_move(position, moves[i]);
-		}
+		evals[i] = eval_move(position, moves[i]);
 	}
 
 	// insertion sort
@@ -53,12 +48,35 @@ static int negamax_alpha_beta(Search *search, const Position *position,
 		return position->eval;
 	}
 
+	Move best_move = NO_MOVE;
+	int best_move_eval = INT_MIN;
+	bool no_more_moves = true;
+
+	const Move table_best_move = table_get_best_move(position->hash);
+
+	if (!IS_NO_MOVE(table_best_move)) {
+		Position temp_position = *position;
+		make_move(&temp_position, table_best_move);
+		no_more_moves = false;
+		int eval = -negamax_alpha_beta(search, &temp_position,
+					       depth - 1, -beta, -alpha);
+
+		if (eval > best_move_eval) {
+			best_move_eval = eval;
+			best_move = table_best_move;
+		}
+		if (eval > alpha) {
+			alpha = eval;
+		}
+		if (beta <= alpha) {
+			table_put(position->hash, table_best_move, depth);
+			return best_move_eval;
+		}
+	}
+
 	Move moves[MAX_MOVES];
 	size_t num_moves = gen_moves(moves, position, false);
 	sort_moves(position, moves, num_moves);
-	size_t best_move_index = -1;
-	int best_move_eval = INT_MIN;
-	bool no_more_moves = true;
 	for (size_t i = 0; i < num_moves; i++) {
 		Position temp_position = *position;
 		make_move(&temp_position, moves[i]);
@@ -72,13 +90,14 @@ static int negamax_alpha_beta(Search *search, const Position *position,
 
 		if (eval > best_move_eval) {
 			best_move_eval = eval;
-			best_move_index = i;
+			best_move = moves[i];
 		}
 		if (eval > alpha) {
 			alpha = eval;
 		}
 		if (beta <= alpha) {
-			break;
+			table_put(position->hash, best_move, depth);
+			return best_move_eval;
 		}
 	}
 	if (no_more_moves) {
@@ -88,7 +107,7 @@ static int negamax_alpha_beta(Search *search, const Position *position,
 			return 0;
 		}
 	}
-	table_put(position->hash, moves[best_move_index], depth);
+	table_put(position->hash, best_move, depth);
 	return best_move_eval;
 }
 
