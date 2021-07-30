@@ -44,6 +44,15 @@ static int negamax_alpha_beta(Search *search, const Position *position,
 		exit(1);
 	}
 	search->nodes++;
+	if (position->halfmove_clock >= 100) {
+		Move tmp[MAX_MOVES];
+		if (gen_legal_moves(tmp, position, false) == 0 &&
+		    is_king_in_check(position, position->side_to_move)) {
+			return -CHECKMATE_EVAL - depth;
+		} else {
+			return 0;
+		}
+	}
 	if (depth == 0) {
 		return position->eval;
 	}

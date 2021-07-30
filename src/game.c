@@ -47,8 +47,9 @@ bool game_make_move(Game *game, Move move)
 	game->moves[game->num_moves++] = move;
 
 	Move tmp_moves[MAX_MOVES];
-	bool has_game_ended =
-		gen_legal_moves(tmp_moves, game->current_position, false) == 0;
+	bool has_game_ended = gen_legal_moves(tmp_moves, game->current_position,
+					      false) == 0 ||
+			      game->current_position->halfmove_clock >= 100;
 	if (has_game_ended) {
 		if (is_king_in_check(game->current_position,
 				     game->current_position->side_to_move)) {
