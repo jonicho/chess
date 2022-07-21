@@ -1,12 +1,13 @@
 TARGET_EXEC = chess
 
-MAKE_RELEASE ?= 0
+DEBUG ?= 0
 
-ifeq ($(MAKE_RELEASE), 0)
-	BUILD_DIR = ./build
+BASE_BUILD_DIR = ./build
+
+ifeq ($(DEBUG), 0)
+	BUILD_DIR = $(BASE_BUILD_DIR)/release
 else
-	BUILD_DIR = ./build_release
-	TEMP_VAR := $(shell $(RM) -r $(BUILD_DIR))
+	BUILD_DIR = $(BASE_BUILD_DIR)/debug
 endif
 
 SRC_DIRS = ./src
@@ -24,10 +25,10 @@ CFLAGS = -Wall -Wextra -pedantic -Werror
 
 LDFLAGS = -pthread
 
-ifeq ($(MAKE_RELEASE), 0)
-	CFLAGS := $(CFLAGS) -g -DDEBUG
-else
+ifeq ($(DEBUG), 0)
 	CFLAGS := $(CFLAGS) -O3
+else
+	CFLAGS := $(CFLAGS) -g -DDEBUG
 endif
 
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
@@ -41,7 +42,7 @@ $(BUILD_DIR)/%.c.o: %.c
 .PHONY: clean
 
 clean:
-	$(RM) -r $(BUILD_DIR)
+	$(RM) -r $(BASE_BUILD_DIR)
 
 -include $(DEPS)
 

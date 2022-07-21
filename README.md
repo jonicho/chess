@@ -13,24 +13,24 @@ $ git clone https://github.com/jonicho/chess
 
 For compilation with optimizations for release compile with:
 ```
-$ make MAKE_RELEASE=1
+$ make
 ```
 This compiles the whole project every time it is run.
-The compiled binary and object files will be in `./build_release`.
+The compiled binary and object files will be in `./build/release/`.
 
 To clean all generated build files run
 ```
-$ make clean MAKE_RELEASE=1
+$ make clean
 ```
 
 ### Compilation for development
 
-To compile with debug symbols for development compile with:
+To compile without optimizations and with debug symbols for development compile with:
 ```
-$ make
+$ make DEBUG=1
 ```
 This only compiles files that changed.
-The compiled binary and object files will be in `./build`.
+The compiled binary and object files will be in `./build/debug/`.
 
 To clean all generated build files run
 ```
@@ -54,10 +54,10 @@ Enter your moves in pure coordinate notation.
 
 To execute tests that test some parts of the implementation run
 ```
-$ ./build/chess test
+$ ./build/debug/chess test
 ```
-or, to run the tests with optimizations, run
-
+or
 ```
-$ ./build_release/chess test
+$ ./build/release/chess test
 ```
+depending on whether you compiled for release or development.
