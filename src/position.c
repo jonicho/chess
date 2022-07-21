@@ -75,11 +75,7 @@ void position_print_board(const Position *position)
 			if (PIECE_TYPE(piece) != EMPTY) {
 				string = piece_code_to_string(piece);
 			} else {
-				if ((rank + file) % 2 == 0) {
-					string = "\u2022";
-				} else {
-					string = "\u25e6";
-				}
+				string = " ";
 			}
 			fputs(string, stdout);
 		}
